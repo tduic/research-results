@@ -1,0 +1,2 @@
+'Trifference.T_ge_N17M109' depends on axioms: [propext, Classical.choice, Quot.sound]
+exit 0 141 s

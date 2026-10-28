@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*/lean/.lake/
+*/lean/build.log
+*.npz
+*.npy

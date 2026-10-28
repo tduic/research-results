@@ -1,0 +1,112 @@
+[
+ {
+  "b": 4,
+  "n": 4,
+  "seed": 1,
+  "l": 1,
+  "cond_2l1_lt_dperp": true,
+  "exact_true_hist": 7.629162047296614,
+  "eig_formula": 7.629162047296614,
+  "semicircle": 9.497844186547358,
+  "max_score": 14
+ },
+ {
+  "b": 4,
+  "n": 4,
+  "seed": 1,
+  "l": 2,
+  "cond_2l1_lt_dperp": false,
+  "exact_true_hist": 9.090045338830308,
+  "eig_formula": 9.096348259507543,
+  "semicircle": 11.062104414532875,
+  "max_score": 14
+ },
+ {
+  "b": 4,
+  "n": 4,
+  "seed": 2,
+  "l": 1,
+  "cond_2l1_lt_dperp": true,
+  "exact_true_hist": 7.629162047296614,
+  "eig_formula": 7.629162047296614,
+  "semicircle": 9.497844186547358,
+  "max_score": 13
+ },
+ {
+  "b": 4,
+  "n": 4,
+  "seed": 2,
+  "l": 2,
+  "cond_2l1_lt_dperp": false,
+  "exact_true_hist": 9.093048132777293,
+  "eig_formula": 9.096348259507543,
+  "semicircle": 11.062104414532875,
+  "max_score": 13
+ },
+ {
+  "b": 4,
+  "n": 5,
+  "seed": 1,
+  "l": 1,
+  "cond_2l1_lt_dperp": true,
+  "exact_true_hist": 7.629162047296614,
+  "eig_formula": 7.629162047296614,
+  "semicircle": 9.497844186547358,
+  "max_score": 14
+ },
+ {
+  "b": 4,
+  "n": 5,
+  "seed": 1,
+  "l": 2,
+  "cond_2l1_lt_dperp": true,
+  "exact_true_hist": 9.096348259507543,
+  "eig_formula": 9.096348259507543,
+  "semicircle": 11.062104414532875,
+  "max_score": 14
+ },
+ {
+  "b": 4,
+  "n": 5,
+  "seed": 2,
+  "l": 1,
+  "cond_2l1_lt_dperp": true,
+  "exact_true_hist": 7.629162047296614,
+  "eig_formula": 7.629162047296614,
+  "semicircle": 9.497844186547358,
+  "max_score": 14
+ },
+ {
+  "b": 4,
+  "n": 5,
+  "seed": 2,
+  "l": 2,
+  "cond_2l1_lt_dperp": true,
+  "exact_true_hist": 9.096348259507543,
+  "eig_formula": 9.096348259507543,
+  "semicircle": 11.062104414532875,
+  "max_score": 14
+ },
+ {
+  "b": 6,
+  "n": 3,
+  "seed": 1,
+  "l": 1,
+  "cond_2l1_lt_dperp": true,
+  "exact_true_hist": 31.56299600050584,
+  "eig_formula": 31.56299600050584,
+  "semicircle": 35.49974999599987,
+  "max_score": 45
+ },
+ {
+  "b": 6,
+  "n": 3,
+  "seed": 2,
+  "l": 1,
+  "cond_2l1_lt_dperp": true,
+  "exact_true_hist": 31.56299600050584,
+  "eig_formula": 31.56299600050584,
+  "semicircle": 35.49974999599987,
+  "max_score": 46
+ }
+]

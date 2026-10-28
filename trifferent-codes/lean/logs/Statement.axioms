@@ -1,0 +1,6 @@
+'T10_ge_30' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T11_ge_36' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T12_ge_48' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T16_ge_108' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T17_ge_109' depends on axioms: [propext, Classical.choice, Quot.sound]
+'not_trifferent_example' depends on axioms: [propext, Classical.choice, Quot.sound]
