@@ -49,15 +49,21 @@ def best_mean(H, l):
     G=V.T@(w[:,None]*V); F=V.T@((w*j)[:,None]*V)
     from scipy.linalg import eigh
     return eigh(F,G,eigvals_only=True)[-1]
-out=[]
-for (b,n,seeds) in [(4,4,[1,2]),(4,5,[1,2]),(6,3,[1,2])]:
-    q=1<<b; m=q-1; k=b//2; r=2**(2*k-1)-2**(k-1); rho=r/q
-    for s in seeds:
-        mem=instance(b,s); assert all(mem[a].sum()==r for a in range(m))
-        sc=scores_all(b,n,mem); H=np.bincount(sc,minlength=m+1).astype(float)
-        for l in range(1,n//2+1):
-            ex=best_mean(H,l); jf=dqi_exact(m,l,rho); sm=m*semicircle(l/m,rho)
-            row=dict(b=b,n=n,seed=s,l=l,cond_2l1_lt_dperp=(2*l+1<n+1),exact_true_hist=ex,eig_formula=jf,semicircle=sm,
-                     max_score=int(sc.max()))
-            print(row); out.append(row)
-json.dump(out,open('results/dqi_verifiable/tiny_dqi_exact.json','w'),indent=1)
+
+def main():
+    out=[]
+    for (b,n,seeds) in [(4,4,[1,2]),(4,5,[1,2]),(6,3,[1,2])]:
+        q=1<<b; m=q-1; k=b//2; r=2**(2*k-1)-2**(k-1); rho=r/q
+        for s in seeds:
+            mem=instance(b,s); assert all(mem[a].sum()==r for a in range(m))
+            sc=scores_all(b,n,mem); H=np.bincount(sc,minlength=m+1).astype(float)
+            for l in range(1,n//2+1):
+                ex=best_mean(H,l); jf=dqi_exact(m,l,rho); sm=m*semicircle(l/m,rho)
+                row=dict(b=b,n=n,seed=s,l=l,cond_2l1_lt_dperp=(2*l+1<n+1),exact_true_hist=ex,eig_formula=jf,semicircle=sm,
+                         max_score=int(sc.max()))
+                print(row); out.append(row)
+    json.dump(out,open('results/dqi_verifiable/tiny_dqi_exact.json','w'),indent=1)
+
+
+if __name__ == '__main__':
+    main()

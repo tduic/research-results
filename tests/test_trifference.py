@@ -104,3 +104,18 @@ def test_committed_axiom_reports_standard():
         n, M = (int(x[1:]) for x in path.stem.split("_")[1:])
         line = (LEAN / "logs" / f"N{n}M{M}.axioms").read_text()
         assert "[propext, Classical.choice, Quot.sound]" in line
+
+
+def test_paper_constructions_regenerate_codes():
+    """The compact descriptions printed in the paper rebuild exactly the shipped codes."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "constructions", Path(__file__).resolve().parent.parent / "trifferent-codes" / "verification" / "constructions.py")
+    con = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(con)
+    built = con.all_codes()
+    for path in CODES:
+        n = int(path.stem.split("_")[1][1:])
+        assert built[n] == {tuple(r) for r in load(path).tolist()}, n
+    D = con.span(con.D16_BASIS)
+    assert len(D) == 27 and sorted({sum(1 for x in d if x) for d in D}) == [0, 9, 12]

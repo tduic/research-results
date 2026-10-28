@@ -1,10 +1,12 @@
 # Trifferent codes: new lower bounds at lengths 10, 11, 12, 16 and 17
 
 > **Status:** Complete (October 2026) · every code verified in Lean 4 (kernel-checked, standard axioms only) · independent statement review and re-check · regression tests in [`tests/test_trifference.py`](../tests/test_trifference.py)
+>
+> **Paper:** [New lower bounds for trifferent codes of lengths 10, 11, 12, 16 and 17](paper/main.pdf) ([LaTeX source](paper/main.tex))
 
 ## Problem
 
-A code C ⊆ {0,1,2}ⁿ is **trifferent** if any three distinct codewords have a coordinate where all three differ. T(n) is the largest size of a trifferent code of length n; equivalently, the largest k for which a perfect hash family PHF(n; k, 3, 3) exists. The exponential growth rate of T(n) is a long-standing open problem, and small-n values are a standard benchmark (Kurz 2023 determined T(7), T(8), T(9) exactly).
+A code C ⊆ {0,1,2}ⁿ is **trifferent** if any three distinct codewords have a coordinate where all three differ. T(n) is the largest size of a trifferent code of length n; equivalently, the largest k for which a perfect hash family PHF(n; k, 3, 3) exists. The exponential growth rate of T(n) is a long-standing open problem, and small-n values are a standard benchmark (Kurz 2024 determined T(7), T(8), T(9) exactly).
 
 ## Results
 
@@ -18,7 +20,7 @@ A code C ⊆ {0,1,2}ⁿ is **trifferent** if any three distinct codewords have a
 
 The codes are in [`codes/`](codes/) as JSON lists of words over {0, 1, 2}.
 
-**The baseline.** "Best published bound" is the closure of everything we found in the literature — T(1..9) exact (Kurz 2023), T(14) ≥ 81 and T(19) ≥ 243 from minimal linear codes (Bishnoi, D'haeseleer, Gijswijt, Potukuchi), and the perfect-hash-family table of Walker and Colbourn (2007, Table 6; transcribed in [`data/`](data/)) — under the two elementary rules T(n) ≥ T(n−1) + 1 and *shortening*, T(n−1) ≥ ⌈2T(n)/3⌉ (keep the words avoiding the rarest symbol in one coordinate and delete that coordinate). The test suite recomputes this closure and asserts that each of the five bounds is strictly above it.
+**The baseline.** "Best published bound" is the closure of everything we found in the literature — T(1..9) exact (Della Fiore–Gnutti–Polak 2022, Kurz 2024), T(14) ≥ 81 and T(19) ≥ 243 from minimal linear codes (Bishnoi, D'haeseleer, Gijswijt, Potukuchi), and the perfect-hash-family table of Walker and Colbourn (2007, Table 6; transcribed in [`data/`](data/)) — under the two elementary rules T(n) ≥ T(n−1) + 1 and *shortening*, T(n−1) ≥ ⌈2T(n)/3⌉ (keep the words avoiding the rarest symbol in one coordinate and delete that coordinate). The test suite recomputes this closure and asserts that each of the five bounds is strictly above it.
 
 ## Verification
 
@@ -31,7 +33,7 @@ The codes are in [`codes/`](codes/) as JSON lists of words over {0, 1, 2}.
 
 Trifferent codes are exactly perfect hash families PHF(n; k, 3, 3), so we checked the PHF literature as well as the trifferent-code literature: Kurz's papers, Walker and Colbourn 2007 (their best values for N = 10…18 are 29, 30, 36, 37, 48, 57, 81, 82, 83, each below the bound used here), the Dwyer covering-array database, and Martirosyan and van Trung's tables. The online PHF tables that succeeded the 2007 table (phftables.com and R. E. Dougherty's tables) could not be reached, so a better entry posted only there cannot be ruled out. Please let us know if you are aware of one.
 
-Lengths 13 and 18 are deliberately not listed: codes of size 54 and 162 exist there, but they equal the shortenings of known minimal linear codes, so they are not new.
+Lengths 13 and 18 are deliberately not listed: we also found codes of size 54 and 162 there, but those sizes equal the shortenings of known minimal linear codes, so they are not new bounds.
 
 ## Reproducing
 

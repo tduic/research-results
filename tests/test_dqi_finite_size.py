@@ -109,3 +109,31 @@ def test_n96_redesign():
     assert best["toffoli_per_run"] == pytest.approx(9.14e6, rel=0.01)
     assert best["toffoli_per_success"] == pytest.approx(1.02e7, rel=0.01)
     assert round(best["qubits"]) == 2510
+
+
+def test_score_law_check():
+    """Model score law vs the twist-averaged instance ensemble (exact) and individual tiny instances (close)."""
+    S = json.load(open(ROOT / "finite_size" / "score_law_check.json"))
+    for row in S["averaged"]:
+        assert abs(row["mean_model"] - row["mean_avg"]) < 1e-9
+        for model, avg in row["tails"].values():
+            assert abs(model - avg) < 1e-12
+    head = next(r for r in S["averaged"] if r["m"] == 4095)
+    assert head["tails"]["2393"][0] == pytest.approx(REDTEAM["l35"]["tails"]["2393"], rel=1e-6)
+    tiny = S["per_instance"]
+    assert len(tiny["instances"]) == 8
+    for inst in tiny["instances"]:
+        assert inst["mean"] == pytest.approx(tiny["model_mean"], abs=1e-9)  # 2l+1 < n+1: mean exact
+        assert abs(inst["tails"]["11"] - tiny["model_tails"]["11"]) < 0.005    # tails only close
+
+
+def test_boundary_mean_correction_small():
+    """At the boundary 2l+1 = n+1 the mean is off by a small amount on exhaustive tiny instances (paper: < 0.016)."""
+    tiny = json.load(open(ROOT / "dqi_verifiable" / "tiny_dqi_exact.json"))
+    ratio = json.load(open(ROOT / "dqi_verifiable" / "r4_redteam_ratio.json"))
+    diffs = [abs(r["exact_true_hist"] - r["eig_formula"]) for r in tiny if not r["cond_2l1_lt_dperp"]]
+    assert diffs and max(diffs) < 0.016
+    assert all(abs(r["exact_true_hist"] - r["eig_formula"]) < 1e-9 for r in tiny if r["cond_2l1_lt_dperp"])
+    rt = [abs(r["diff"]) for r in ratio["tiny"] if r["two_l_plus_1"] >= r["d_perp"]]
+    assert rt and max(rt) < 0.016
+    assert all(abs(r["diff"]) < 1e-9 for r in ratio["tiny"] if r["two_l_plus_1"] < r["d_perp"])

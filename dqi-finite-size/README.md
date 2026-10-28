@@ -1,6 +1,8 @@
 # Google's verifiable DQI instance: a finite-size correction
 
 > **Status:** Complete (October 2026) · re-derived independently and red-teamed · regression tests in [`tests/test_dqi_finite_size.py`](../tests/test_dqi_finite_size.py)
+>
+> **Paper:** [Finite-size corrections to the classical cost of a verifiable decoded-quantum-interferometry advantage](paper/main.pdf) ([LaTeX source](paper/main.tex))
 
 ## Bottom line
 
@@ -8,15 +10,15 @@ Khattar et al. ([arXiv 2510.10967](https://arxiv.org/abs/2510.10967)) propose De
 
 That classical figure scores the attacker against a target the quantum algorithm rarely reaches. The paper sets the target score with the asymptotic semicircle law; at this finite size DQI falls short of it by a predictable amount. Measured fairly — classical trials per quantum run — **every row of the paper's Table VI overstates the classical gap by 14–18.5× (16.8× at the headline instance).** The advantage itself survives, and a modestly larger instance restores the claimed margin.
 
-- **At the headline instance** (m = 4095, n = 70, ℓ = 35), the paper's target is t = 2,393. The exact DQI score has mean 2,359.7, median 2,362 and standard deviation 31.8; one run reaches 2,393 only about 3% of the time (6% with the polynomial re-optimized for the tail), so it takes about 17 runs.
-- **The shortfall follows a simple law.** Truncating DQI's enhancing polynomial at degree ℓ acts like a hard wall at the edge of a Jacobi spectrum, so the top eigenvalue sits an Airy distance below the semicircle edge. A law with the first Airy zero |a₁| = 2.338 fixed and two fitted correction terms predicts the shortfall within 4.3% (1.2% rms) over 588 grid points with m = 2⁷…2¹⁴, and within 1% on fresh points with m = 2¹⁵…2¹⁸ that were not used in the fit. At the headline instance it predicts 33.4 against the exact 33.2.
-- **The fix is a bigger instance, not repetition.** Classical cost grows about 300× per +10 in degree while the Toffoli count grows about 1.2×. The cheapest design reaching 10²³ classical trials per quantum success is **n = 96 at 90% success: about 9.1 million Toffoli gates per run (10.2 million per success) and 2,510 logical qubits.** Keeping n = 70 and repeating needs about 67 runs, 37× worse.
+- **At the headline instance** (m = 4095, n = 70, ℓ = 35), the paper's target is t = 2,393. The DQI score has mean 2,359.7, median 2,362 and standard deviation 31.8 (from the score law below); one run reaches 2,393 only about 3% of the time (6% with the polynomial re-optimized for the tail), so it takes about 17 runs.
+- **The shortfall follows a simple law.** Truncating DQI's enhancing polynomial at degree ℓ acts like a hard wall at the edge of a Jacobi spectrum, so the top eigenvalue sits an Airy distance below the semicircle edge. A law with the first Airy zero |a₁| = 2.338 fixed and two fitted correction terms predicts the shortfall within 4.3% (1.2% rms) over 588 grid points with m = 2⁷…2¹⁴, and within 1.1% on a fresh grid with m = 2¹⁵…2¹⁸ that was not used in the fit. At the headline instance it predicts 33.4 against 33.2 from the Jacobi matrix.
+- **The fix is a bigger instance, not repetition.** Classical cost grows 260–490× per +10 in n while the Toffoli count grows about 1.2×. The cheapest design reaching 10²³ classical trials per quantum success is **n = 96 at 90% success: about 9.1 million Toffoli gates per run (10.2 million per success) and 2,510 logical qubits.** Keeping n = 70 and repeating needs about 67 runs, 38× worse.
 
 The paper's asymptotic theorem is unaffected; only its concrete Table VI numbers shift.
 
 ## Method
 
-**Exact finite-size score law.** For a DQI run with enhancing-polynomial weights w of degree ≤ ℓ, the score s (number of satisfied constraints) has law π(s) = Binom(m, p)(s) · (Σₖ wₖ eₖ(s))², where eₖ are the Krawtchouk polynomials orthonormal under Binom(m, p) and p is the target density. This is exact when 2ℓ + 1 is below the dual distance (n + 1); the paper's ℓ = n/2 is the borderline case, where exhaustive checks on tiny instances agree to ±0.015 ([`results/dqi_verifiable/tiny_dqi_exact.json`](results/dqi_verifiable/tiny_dqi_exact.json)). The mean-optimal w is the top eigenvector of an (ℓ+1)×(ℓ+1) Jacobi matrix, whose eigenvalue is the exact mean; the tail-optimal w for P(s ≥ t) is the top eigenvector of a truncated Gram matrix.
+**Finite-size score law.** For a DQI run with enhancing-polynomial weights w of degree ≤ ℓ, the model score law is π(s) = Binom(m, p)(s) · (Σₖ wₖ eₖ(s))², where eₖ are the Krawtchouk polynomials orthonormal under Binom(m, p) and p is the target density. Its mean is exact when 2ℓ + 1 is below the dual distance (n + 1). Its tail probabilities are exact for the paper's random-instance ensemble (averaged over the twist they agree to 10⁻¹⁴ at the Table VI instances), while an individual instance's tails fluctuate slightly around them (0.181–0.184 against 0.182 on small exhaustive instances; [`results/finite_size/score_law_check.json`](results/finite_size/score_law_check.json)). The paper's ℓ = n/2 is the borderline case, where the mean picks up a correction that exhaustive checks on tiny instances put within 0.016 ([`results/dqi_verifiable/`](results/dqi_verifiable/)); it is not bounded at the Table VI sizes. The mean-optimal w is the top eigenvector of an (ℓ+1)×(ℓ+1) Jacobi matrix, whose eigenvalue is the expected score; the tail-optimal w for P(s ≥ t) is the top eigenvector of a truncated Gram matrix.
 
 **Independent derivations.** The exact mean was first computed from the expected-score theorem of Jordan et al. ([`experiments/dqi_verifiable/dqi_exact_t.py`](experiments/dqi_verifiable/dqi_exact_t.py)). A red team then re-derived the full score law separately, from a multilinear identity on the constraint indicators, in 60-digit arithmetic ([`experiments/dqi_verifiable/r4_redteam_exact.py`](experiments/dqi_verifiable/r4_redteam_exact.py)). The production code ([`experiments/finite_size/dqi_core.py`](experiments/finite_size/dqi_core.py)) implements the red team's derivation in float64 with a log-scaled recurrence, for speed at large m. The tests check all three against each other.
 
@@ -30,7 +32,7 @@ The paper's asymptotic theorem is unaffected; only its concrete Table VI numbers
 D ≈ g · ( 2.338·X − 1.46 + 0.137/X )
 ```
 
-where D is the semicircle value minus the exact mean. The leading term is the classical Airy edge asymptotic for the extreme zeros of Krawtchouk- and Hermite-type orthogonal polynomials, so it is not new; what is new here is its use for DQI, the two fitted corrections (constants fitted on m = 2⁷…2¹⁴, ℓ/m from 0.001 to 0.3, p from 0.05 to 0.5; [`results/finite_size/airy_deficit.json`](results/finite_size/airy_deficit.json), `fits`) and the audit. The leading term alone is off by up to 80% at small ℓ, so the corrections matter. This is an empirical law, not a theorem.
+where D is the semicircle value minus the top Jacobi eigenvalue. The leading term is the classical Airy edge asymptotic for the extreme zeros of Krawtchouk- and Hermite-type orthogonal polynomials, so it is not new; what is new here is its use for DQI, the two fitted corrections (constants fitted on m = 2⁷…2¹⁴, ℓ ≥ 3, ℓ/m from 0.001 to 0.3, p from 0.05 to 0.5; [`results/finite_size/airy_deficit.json`](results/finite_size/airy_deficit.json), `fits`) and the audit. The leading term alone is off by up to 82% at small ℓ, so the corrections matter. This is an empirical law, not a theorem.
 
 ## Results
 

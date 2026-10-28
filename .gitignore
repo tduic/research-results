@@ -5,3 +5,11 @@ __pycache__/
 */lean/build.log
 *.npz
 *.npy
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz

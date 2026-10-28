@@ -1,0 +1,133 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[expansion=false]{microtype}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\hypersetup{pdftitle={Finite-size corrections to the classical cost of a verifiable decoded-quantum-interferometry advantage},pdfauthor={Tyler Duic}}
+
+\input{numbers.tex}
+
+\newcommand{\Binom}{\mathrm{Binom}}
+
+\title{Finite-size corrections to the classical cost of a\\ verifiable decoded-quantum-interferometry advantage}
+\author{Tyler Duic\\[2pt]\small Independent researcher, New York, NY\\\small\url{https://github.com/tduic}}
+\date{October 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Khattar et al.\ propose decoded quantum interferometry (DQI) on a structured polynomial-intersection problem over $\mathbb{F}_{2^{12}}$ as a verifiable demonstration of quantum advantage, with a headline instance that requires about $10^{23}$ trials of the best known classical attack.
+That classical cost is evaluated at a target score set by the asymptotic semicircle law for the DQI expected score.
+At the sizes in question a single DQI run falls short of this target by a predictable amount: at the headline instance the expected score is $\exactMean$ against a target of $\tPaper$, and one run reaches the target only $\PtailHead\%$ of the time even with the enhancing polynomial optimized for the tail.
+Measured as classical trials per quantum run, every entry of the paper's resource table overstates the classical gap by a factor of $\overMin$--$\overMax$ ($\overHead$ at the headline instance).
+The shortfall is described to within $\fitMaxErr\%$ by a law built on the Airy edge asymptotic of the underlying Jacobi spectrum, and a moderately larger instance ($n=\bestN$, about $\bestToffRun$ million Toffoli gates per run) restores the claimed margin.
+The asymptotic results of the original paper are unaffected.
+\end{abstract}
+
+\section{Introduction}
+
+Decoded quantum interferometry~\cite{jordan2025dqi} reduces approximate optimization to decoding: for a max-LINSAT problem with $m$ constraints, a DQI run with an enhancing polynomial of degree $\ell$ outputs an assignment whose number of satisfied constraints (its \emph{score}) is, in expectation, given by a semicircle law in the limit of large $m$.
+Khattar et al.~\cite{khattar2025verifiable} use this to design a verifiable advantage experiment: a twisted ``bent target'' optimal polynomial intersection problem with $m=q-1$ constraints over $\mathbb{F}_q$, $q=2^b$, and an unknown polynomial of degree at most $n-1$.
+They compile DQI circuits for several instances and compare against an extended form of Prange's information-set attack~\cite{prange1962}, which they call XP~\cite[Sec.~III.B]{khattar2025verifiable}, in their Table~VI.
+At the headline instance $(m,n,b)=(4095,70,12)$ they report about 5.7 million Toffoli gates and $1.97\times 10^{23}$ XP trials.
+
+The classical cost in Table~VI is computed at the target score $t$ obtained by plugging the instance into the asymptotic semicircle law.
+This note makes two observations.
+First, at these sizes the score of a single DQI run falls well short of that target, so the fair classical cost to compare with one quantum run is smaller by the number of runs DQI needs to reach $t$ (Section~\ref{sec:fair}).
+Second, the shortfall is predictable from a simple finite-size law (Section~\ref{sec:airy}), which shows how to size an instance that does reach the claimed margin (Section~\ref{sec:redesign}).
+All numbers below are reproduced by code and tests in the accompanying repository.
+
+\section{The finite-size score distribution}\label{sec:exact}
+
+Let $p=r/q$ be the density of each constraint's target set ($r=2016$ for $b=12$), and let $e_0,e_1,\dots$ be the Krawtchouk polynomials orthonormal with respect to the binomial distribution $\Binom(m,p)$.
+Jordan et al.\ show that the expected DQI score with enhancing-polynomial weights $w=(w_0,\dots,w_\ell)$, $\|w\|=1$, is the quadratic form of $w$ in an $(\ell+1)\times(\ell+1)$ tridiagonal (Jacobi) matrix~\cite[Lemma~9.2 of the arXiv version]{jordan2025dqi}, so the mean-optimal weights are its top eigenvector and the optimal expected score is its top eigenvalue.
+That lemma is stated for prime fields; Khattar et al.\ apply the same analysis over $\mathbb{F}_{2^b}$, and we do the same.
+The derivation uses that the constraint indicators of a uniformly random assignment have the joint moments of independent Bernoulli($p$) variables up to the order the computation needs, which holds when $2\ell+1$ is below the dual distance $n+1$ of the underlying Reed--Solomon code.
+The same reasoning gives the model score law
+\begin{equation}\label{eq:law}
+  \pi_w(s) \;=\; \Binom(m,p)(s)\,\Bigl(\sum_{k=0}^{\ell} w_k\, e_k(s)\Bigr)^{2}, \qquad s=0,\dots,m.
+\end{equation}
+Its mean is exact under the condition above, but its tail probabilities are not exact for an individual instance, whose score histogram is binomial only in its low moments.
+They do describe the instance ensemble of~\cite{khattar2025verifiable}: averaging over the random twist of the target sets, the score histogram of a random assignment is a mixture of binomials over the number of roots of the candidate polynomial (we treat that number as binomially distributed), and at the Table~VI instances the resulting DQI tail probabilities agree with \eqref{eq:law} to within $\avgTailDiff$.
+On small instances ($b=4$, $n=5$, $\ell=2$), where every assignment can be enumerated, the mean agrees exactly and the probability of reaching score $11$ ranges over $\tinyTailMin$--$\tinyTailMax$ across eight random instances, against $\tinyTailModel$ for the model.
+
+The paper's choice $\ell=n/2$ sits exactly at the boundary $2\ell+1=n+1$, where the mean picks up a correction term.
+We have not bounded it at the Table~VI sizes; on small instances ($b=4$ and $6$) exhaustive enumeration puts it within $0.016$ in score.
+The expected scores below are the values of the Jacobi-matrix formula, subject to this caveat.
+For a target $t$, the tail-optimal weights maximizing $\Pr_w[s\ge t]$ under \eqref{eq:law} are the top eigenvector of the Gram matrix $M_{jk}(t)=\sum_{s\ge t}\Binom(m,p)(s)\,e_j(s)\,e_k(s)$.
+
+We computed these quantities three ways: from the expected-score formula directly, from an independent re-derivation of \eqref{eq:law} in 60-digit arithmetic, and from a float64 implementation with a log-scaled three-term recurrence used for large $m$.
+They agree to numerical precision on every instance tested.
+
+At the headline instance ($m=4095$, $n=70$, $\ell=35$) the semicircle target is $t=\tPaper$.
+The score distribution \eqref{eq:law} with mean-optimal weights has mean $\exactMean$, median $\exactMedian$ and standard deviation $\exactSd$.
+A mean-optimal run reaches $t$ with probability $\PmeanHead\%$; with tail-optimal weights the probability is $\PtailHead\%$, so on average $\runsHead$ runs are needed.
+
+\section{Classical trials per quantum run}\label{sec:fair}
+
+We reproduced the XP trial counts of Table~VI for all $\xpRowsChecked$ rows we checked, to the three significant figures printed ($\xpHead$ at the headline instance).
+Those counts are the expected number of classical trials needed to find an assignment of score at least $t$.
+A quantum experimentalist running DQI must also repeat until a run reaches $t$, which takes $1/\Pr_w[s\ge t]$ runs on average.
+The classical cost to compare with \emph{one} quantum run is therefore the XP count multiplied by $\Pr_w[s\ge t]$, and the published figure overstates it by the factor $1/\Pr_w[s\ge t]$.
+Table~\ref{tab:vi} lists this factor for every row, using the tail-optimal weights, which favour DQI.
+
+\begin{table}[ht]
+\centering
+\input{table_vi.tex}
+\caption{Instances of Table~VI of~\cite{khattar2025verifiable} ($b=10$ for $m=1023$, $b=12$ for $m=4095$, $\ell=n/2$). ``Overstatement'' is the number of tail-optimal DQI runs needed, on average, to reach the paper's target score $t$; dividing the paper's classical trial count by it gives the classical cost per quantum run. The headline instance is in bold.}
+\label{tab:vi}
+\end{table}
+
+The overstatement ranges from $\overMin$ to $\overMax$ across the table and is $\overHead$ at the headline instance, so the headline classical gap is about $\perRunHead$ trials per quantum run rather than $\xpHead$.
+The advantage survives, and the asymptotic analysis of~\cite{khattar2025verifiable} is unaffected; only the concrete figures shift.
+
+\section{A finite-size law for the shortfall}\label{sec:airy}
+
+Write $a_k$ and $b_k$ for the diagonal and off-diagonal entries of the Jacobi matrix. The semicircle value equals the local band edge $a_\ell+2b_\ell$ at index $\ell$; truncating the enhancing polynomial at degree $\ell$ imposes a hard wall there, and the top eigenvalue of the truncated matrix sits an Airy distance below that edge.
+This is the standard edge behaviour of extreme zeros of classical orthogonal polynomials (compare the Hermite case in~\cite[\S6.32]{szego1975}); we do not claim novelty for the leading term.
+Let $D$ be the semicircle value minus the top eigenvalue, and set
+\[
+  \beta=\sqrt{p(1-p)\,\ell(m-\ell)},\qquad g=(1-2p)+\sqrt{p(1-p)}\,\frac{m-2\ell}{\sqrt{\ell(m-\ell)}},\qquad X=(\beta/g)^{1/3}.
+\]
+We find that
+\begin{equation}\label{eq:airy}
+  D \;\approx\; g\left(|a_1|\,X + c_0 + \frac{c_1}{X}\right), \qquad |a_1| = \airyZero,\quad c_0=\fitCzero,\quad c_1=\fitCone,
+\end{equation}
+where $a_1$ is the first zero of the Airy function and $c_0,c_1$ are fitted.
+Over a grid of $\fitPoints$ instances with $m=2^{\gridMmin},\dots,2^{\gridMmax}$, $\ell\ge 3$, $\ell/m$ from $0.001$ to $0.3$ and $p$ from $0.05$ to $0.5$, \eqref{eq:airy} is within $\fitMaxErr\%$ of the exact value ($\fitRmsErr\%$ rms).
+On a fresh grid with $m=2^{15},\dots,2^{18}$, outside the fitting range but with the same ranges of $\ell/m$ and $p$, it is within $\heldOutMax\%$.
+The leading term alone is off by up to $\leadOnlyErr\%$ at small $\ell$, so the corrections matter.
+At the headline instance \eqref{eq:airy} gives $D=\deficitAiry$ against the exact $\deficitExact$.
+Equation~\eqref{eq:airy} is an empirical law; we have not proved an error bound for it.
+
+For small $\ell/m$ the shortfall is of the order of one binomial standard deviation of the score, so any concrete hardness figure that evaluates a classical attack at the semicircle value overstates the classical cost per quantum run.
+
+\section{Restoring the claimed margin}\label{sec:redesign}
+
+The cheapest fix is a larger instance rather than repetition.
+Along the $b=12$ rows of Table~VI, each increase of $n$ by 10 multiplies the classical trial count by $\growthMin$--$\growthMax$ while the Toffoli count grows by a factor of about $\tofGrowth$.
+We searched over $n$ (with $\ell=\lfloor n/2\rfloor$), the target $t$ and tail-optimal weights for the design minimizing Toffoli gates per quantum success subject to at least $10^{23}$ classical trials per quantum run, interpolating the paper's Toffoli and qubit counts across $n=60$--$100$.
+For speed this search uses a simplified XP allocation, which agrees with the paper's counts to within 10\% on the Table~VI rows.
+The optimum is $n=\bestN$ with a target reached in $\bestP\%$ of runs: about $\bestToffRun$ million Toffoli gates per run ($\bestToffSucc$ million per success), $\bestQubits$ logical qubits and $\bestFair$ classical trials per quantum run. Re-priced with the paper's own XP allocation the margin is thinner but still sufficient: $\bestFairPaperXP$ classical trials per quantum run.
+Keeping $n=70$ and raising the target instead needs about $\nSeventyRuns$ runs per success and is about $\nSeventyWorse$ times more expensive in Toffoli gates.
+
+\section{Discussion}
+
+The comparison here assumes that the relevant classical task is to match the score that the quantum device actually achieves, run by run; other operational definitions of advantage shift the factor but not the conclusion that the asymptotic target is too generous at this size.
+Resource counts for the redesigned instance are interpolated from the original paper rather than compiled.
+The same check applies to any concrete DQI resource estimate: compute the finite-size score distribution, or use~\eqref{eq:airy}, before pricing the classical attack.
+
+\paragraph{Data and code availability.}
+Code, data and regression tests reproducing every number in this note are at \url{https://github.com/tduic/research-results/tree/main/dqi-finite-size}.
+
+\paragraph{Acknowledgments.}
+The analysis, code and an independent re-derivation were carried out with substantial assistance from AI models (Anthropic's Claude), working under the author's direction; the author checked every claim and reference in this note and takes full responsibility for its content.
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}

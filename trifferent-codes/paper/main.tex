@@ -1,0 +1,140 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[expansion=false]{microtype}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\hypersetup{pdftitle={New lower bounds for trifferent codes of lengths 10, 11, 12, 16 and 17},pdfauthor={Tyler Duic}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\w}[1]{\texttt{#1}}
+
+\title{New lower bounds for trifferent codes\\ of lengths 10, 11, 12, 16 and 17}
+\author{Tyler Duic\\[2pt]\small Independent researcher, New York, NY\\\small\url{https://github.com/tduic}}
+\date{October 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A code $C\subseteq\{0,1,2\}^n$ is trifferent if any three distinct codewords have a coordinate in which they are pairwise distinct; equivalently, $C$ is a perfect hash family $\mathrm{PHF}(n;|C|,3,3)$.
+Writing $T(n)$ for the largest size of a trifferent code of length $n$, we give explicit codes showing
+$T(10)\ge 30$, $T(11)\ge 36$, $T(12)\ge 48$, $T(16)\ge 108$ and $T(17)\ge 109$.
+Each improves on every bound we found in the literature, including the closure of the known values under the elementary monotonicity and shortening rules.
+The codes have short algebraic descriptions: unions of orbits of a translation and a cyclic shift for $n\le 12$, and four cosets of a linear $[16,3]_3$ code for $n=16$.
+Each bound is verified by the Lean~4 proof assistant against a direct definition of trifference.
+\end{abstract}
+
+\section{Introduction}
+
+A code $C\subseteq\{0,1,2\}^n$ is \emph{trifferent} if for any three distinct $x,y,z\in C$ there is a coordinate $i$ with $\{x_i,y_i,z_i\}=\{0,1,2\}$.
+Let $T(n)$ denote the maximum size of a trifferent code of length $n$.
+Determining the growth rate of $T(n)$ is a long-standing problem in information theory and combinatorics; the classical bounds are due to Fredman and Koml\'os~\cite{fredman1984} and K\"orner and Marton~\cite{korner1988}.
+Equivalently, a trifferent code of length $n$ and size $k$ is a perfect hash family $\mathrm{PHF}(n;k,3,3)$: the $n$ coordinates are functions from the $k$ codewords to a $3$-set, and every $3$-subset of codewords is separated by one of them~\cite{walker2007}.
+
+Exact values are known for small lengths: $T(5)=10$ and $T(6)=13$~\cite{dellafiore2022}, and $T(7)=16$, $T(8)=20$, $T(9)=27$~\cite{kurz2024}.
+For larger $n$, lower bounds come from tables of perfect hash families~\cite{walker2007} and from linear codes: a linear code over $\F_3$ is trifferent if and only if it is minimal, and minimal $[14,4]_3$ and $[19,5]_3$ codes give $T(14)\ge 81$ and $T(19)\ge 243$~\cite{bishnoi2023,kurz2024}.
+
+Our contribution is five improved lower bounds for small lengths, each witnessed by an explicit code and checked by a proof assistant.
+
+\begin{theorem}\label{thm:main}
+$T(10)\ge 30$, $T(11)\ge 36$, $T(12)\ge 48$, $T(16)\ge 108$ and $T(17)\ge 109$.
+\end{theorem}
+
+\section{The baseline}
+
+Two elementary rules propagate bounds between lengths.
+First, $T(n)\ge T(n-1)+1$~\cite[Lemma~1 and Corollary~2]{kurz2024}: given a trifferent code $C$ of length $n-1$ and $c\in C$, the code $\{(c,0),(c,1)\}\cup\{(c',2):c'\in C\setminus\{c\}\}$ is trifferent of length $n$.
+Second, \emph{shortening}: $T(n-1)\ge\lceil 2T(n)/3\rceil$, equivalently $T(n)\le\lfloor 3T(n-1)/2\rfloor$ (cf.~\cite{kurz2024}).
+Indeed, if $C$ has length $n$, some symbol $a$ occurs in a given coordinate in at most $|C|/3$ codewords; deleting those codewords and then that coordinate leaves a trifferent code of length $n-1$ with at least $\lceil 2|C|/3\rceil$ words. Three remaining words take at most two values in the deleted coordinate, so they are separated by another coordinate; for the same reason (when at least three words remain) no two remaining words coincide after the deletion.
+
+As a baseline we take the best published values---the exact values above, the linear-code bounds $T(14)\ge 81$ and $T(19)\ge 243$, and the best values in Table~6 of Walker and Colbourn~\cite{walker2007}, which are $29,30,36,37,48,57,81,82,83$ for $n=10,\dots,18$---and close them under both rules.
+Table~\ref{tab:bounds} compares the result with Theorem~\ref{thm:main}.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrlrr}
+\toprule
+$n$ & baseline & source of baseline & new bound & gain \\
+\midrule
+10 & 29 & Walker--Colbourn~\cite{walker2007} & 30 & $+1$\\
+11 & 30 & Walker--Colbourn~\cite{walker2007} & 36 & $+6$\\
+12 & 36 & Walker--Colbourn~\cite{walker2007} & 48 & $+12$\\
+16 & 83 & $T(14)\ge 81$ and two steps of $T(n)\ge T(n-1)+1$ & 108 & $+25$\\
+17 & 108 & shortening $T(18)\ge 162$, itself shortened from $T(19)\ge 243$ & 109 & $+1$\\
+\bottomrule
+\end{tabular}
+\caption{Best bounds we found before this work (the closure described in the text) and the new bounds.}
+\label{tab:bounds}
+\end{table}
+
+\begin{remark}
+We also found codes of size $54$ at $n=13$ and $162$ at $n=18$, but these sizes equal the shortenings of the minimal $[14,4]_3$ and $[19,5]_3$ codes, so they are not new bounds.
+\end{remark}
+
+\section{The codes}
+
+Throughout, codewords are written as strings over $\{0,1,2\}$, and for $s\mid n$ we let $G_s$ be the group of maps on $\{0,1,2\}^n$ generated by $x\mapsto x+(1,\dots,1)\pmod 3$ and the cyclic shift of coordinates by $s$ positions.
+
+\paragraph{Length 10.} The code is the union of the $G_2$-orbits of
+\w{0001101220} and \w{0012020120}, each of size $15$, giving $30$ words.
+
+\paragraph{Length 11.} The code is the union of the $G_1$-orbits of
+\w{00000000000} (size $3$) and \w{00011101201} (size $33$), giving $36$ words.
+
+\paragraph{Length 12.} The code is the union of the $G_2$-orbits of
+\w{000111222111}, \w{000121012221} (each of size $18$), \w{000122201112} and \w{010201020102} (each of size $6$), giving $48$ words.
+
+\paragraph{Length 16.} Let $D\subseteq\F_3^{16}$ be the linear code spanned by
+\[
+\w{0001221202201001},\qquad \w{0110120102221111},\qquad \w{1010100010111101}.
+\]
+It has dimension $3$ and nonzero weights $9$ and $12$; being trifferent and linear, it is a minimal code~\cite{bishnoi2023}.
+The code is the union of the four cosets $r+D$ with
+\[
+r\in\{\w{0000000000000000},\ \w{0010011222101021},\ \w{0010122101011012},\ \w{0020221012102011}\},
+\]
+giving $108$ words.
+
+\paragraph{Length 17.} Apply the construction of~\cite[Lemma~1]{kurz2024} to the length-16 code with $c=0$: the code is $\{(0,0),(0,1)\}\cup\{(c',2): c'\in C_{16}\setminus\{0\}\}$, where $C_{16}$ is the length-16 code, with $109$ words.
+
+\medskip
+The full codes are listed in machine-readable form in the accompanying repository, together with a script that rebuilds them from the descriptions above.
+
+\section{Verification}
+
+Checking trifference directly is a finite computation over $\binom{|C|}{3}$ triples---about $2\times 10^5$ for the length-16 code---but we wanted a check that does not rely on trusting a particular program.
+We therefore verified each bound in the Lean~4 proof assistant~\cite{demoura2021lean4} using Mathlib~\cite{mathlib2020}.
+
+\begin{itemize}
+\item \textbf{Definition.} Trifference is defined directly on finite sets of functions $\{1,\dots,n\}\to\{0,1,2\}$: for all pairwise distinct $x,y,z\in C$ there is $i$ with $x_i,y_i,z_i$ pairwise distinct.
+\item \textbf{Statement.} Each bound in Theorem~\ref{thm:main} is proved in the form $\exists\, C\subseteq\{0,1,2\}^n,\ C$ trifferent $\wedge\ k\le |C|$.
+\item \textbf{Method.} A bitmask checker on lists of codewords is proved sound once, in general; it is then evaluated on each explicit code by the Lean kernel (using \texttt{decide} with kernel reduction, in chunks to bound memory). No compiled or native evaluation is trusted, and the only axioms used are the standard ones of Lean's logic (\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}).
+\item \textbf{Independent statement check.} A separately written definition of trifference is proved equivalent to the one used, each bound is restated with it, and a three-word code that is not trifferent is shown to be rejected, so the definition is not vacuous.
+\end{itemize}
+
+Independently of Lean, every code was re-checked triple by triple with separate code, and the Lean certificates were decoded and compared word for word with the published codes.
+
+\section{Remarks}
+
+The gains at $n=10$ and $n=17$ are small; the latter is a direct consequence of the length-16 code.
+The largest gains are at $n=12$ and $n=16$, where structured codes---orbit unions and cosets of a minimal linear code---exceed both the values in the perfect hash family tables and the linear-code bounds propagated by the elementary rules.
+We compared against the trifferent-code literature cited above and the perfect hash family tables of~\cite{walker2007}. We were unable to consult later online tables of perfect hash families and would be grateful to learn of any entry there that matches or exceeds these values.
+
+\paragraph{Data and code availability.}
+The codes, the Lean~4 proofs and the checking scripts are at \url{https://github.com/tduic/research-results/tree/main/trifferent-codes}.
+
+\paragraph{Acknowledgments.}
+The search, the Lean formalization and the independent checks were carried out with substantial assistance from AI models (Anthropic's Claude), working under the author's direction; the author checked every claim and reference in this note and takes full responsibility for its content.
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}
