@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use a result from this repository, please cite the paper for that result (listed under references)."
+title: "Research results"
+type: software
+authors:
+  - family-names: Duic
+    given-names: Tyler
+    orcid: "https://orcid.org/0009-0005-4675-3045"
+repository-code: "https://github.com/tduic/research-results"
+license: Apache-2.0
+date-released: "2026-10-28"
+keywords:
+  - decoded quantum interferometry
+  - quantum advantage
+  - trifferent codes
+  - perfect hash families
+  - Lean 4
+references:
+  - type: unpublished
+    title: "Finite-size corrections to the classical cost of a verifiable decoded-quantum-interferometry advantage"
+    authors:
+      - family-names: Duic
+        given-names: Tyler
+        orcid: "https://orcid.org/0009-0005-4675-3045"
+    year: 2026
+    notes: "Preprint. Source, data and code: dqi-finite-size/"
+    url: "https://github.com/tduic/research-results/blob/main/dqi-finite-size/paper/main.pdf"
+  - type: unpublished
+    title: "New lower bounds for trifferent codes of lengths 10, 11, 12, 16 and 17"
+    authors:
+      - family-names: Duic
+        given-names: Tyler
+        orcid: "https://orcid.org/0009-0005-4675-3045"
+    year: 2026
+    notes: "Preprint. Codes and Lean 4 proofs: trifferent-codes/"
+    url: "https://github.com/tduic/research-results/blob/main/trifferent-codes/paper/main.pdf"

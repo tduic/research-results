@@ -67,3 +67,23 @@ def test_trifference_paper_constructions_match_builder():
         assert f"$G_{s}$-orbits" in tex or f"$G_{{{s}}}$-orbits" in tex
     for n, C in con.all_codes().items():
         assert f"giving ${len(C)}$ words" in tex or f"with ${len(C)}$ words" in tex, n
+
+
+PROSE = [ROOT / "README.md"] + [ROOT / n / "README.md" for n in RESULTS] + [ROOT / n / "paper" / "main.tex" for n in RESULTS]
+
+
+@pytest.mark.parametrize("path", PROSE, ids=lambda p: str(p.relative_to(ROOT)))
+def test_single_author_voice(path):
+    """One person did this work: write "I", not "we"/"our"/"us"."""
+    text = re.sub(r"\\cite\{[^}]*\}|https?://\S+", "", path.read_text())
+    hits = re.findall(r".{0,30}\b(?:[Ww]e|[Oo]ur|[Oo]urs|[Uu]s|[Oo]urselves)\b.{0,30}", text)
+    assert not hits, hits[:5]
+
+
+def test_citation_file_lists_every_paper():
+    cff = (ROOT / "CITATION.cff").read_text()
+    for name in RESULTS:
+        tex = (ROOT / name / "paper" / "main.tex").read_text()
+        title = " ".join(re.search(r"\\title\{(.*?)\}\n", tex, re.S).group(1).replace("\\\\", " ").split())
+        assert f'title: "{title}"' in cff, title
+        assert f"{name}/paper/main.pdf" in cff

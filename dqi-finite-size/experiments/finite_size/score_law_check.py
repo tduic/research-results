@@ -2,7 +2,7 @@
 
 (a) Instance-averaged: averaging over the random twist of the instance, the score histogram of a uniformly
     random assignment is a mixture over the number z of roots of Q in F_q^* (indicator 0 there) of
-    Binomial(m - z, r/(q-1)). We compare the resulting DQI law with the binomial model at the Table VI instances.
+    Binomial(m - z, r/(q-1)). This compares the resulting DQI law with the binomial model at the Table VI instances.
 (b) Per instance: on tiny instances (b = 4, n = 5, l = 2) the true histogram is enumerated exhaustively and the
     DQI law H(s) * P(s)^2 compared with the model for the mean and the tail probabilities.
 

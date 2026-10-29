@@ -1,6 +1,6 @@
-"""Reproduce Table VI of Khattar et al. 2510.10967: DQI semicircle t, Prange trials (Eq.18), XP trials (Eq.22)
+"""Reproduce Table VI of Khattar et al. 2510.10967 (all 10 rows): DQI semicircle t, Prange trials (Eq.18), XP trials (Eq.22)
 XP: optimise allocation counts c_s (number of coordinates paying s bits) maximising P(sum Ber >= t).
-We search allocations of the form: c_K forced (s=k+1, P=1), plus c_j coords at one intermediate s=j, rest at s=0.
+Allocations searched have the form: c_K forced (s=k+1, P=1), plus c_j coords at one intermediate s=j, rest at s=0.
 (also mixed 2-level) -- exact Poisson-binomial tails via log-space binomial convolution."""
 import numpy as np, math, json, sys
 from scipy.stats import binom
@@ -51,9 +51,9 @@ def prange_logp(m, n, rho, t):
 if __name__ == "__main__":
     rows = []
     for (m, n, b, r, tabP, tabXP) in [(1023,60,10,496,5.49e19,1.92e15),(1023,70,10,496,1.26e22,4.64e16),
-                                      (1023,80,10,496,4.30e24,1.22e18),(1023,100,10,496,1.75e29,2.56e20),
+                                      (1023,80,10,496,4.30e24,1.22e18),(1023,90,10,496,1.07e27,2.08e19),(1023,100,10,496,1.75e29,2.56e20),
                                       (4095,60,12,2016,2.02e23,4.02e20),(4095,70,12,2016,4.75e26,1.97e23),
-                                      (4095,80,12,2016,9.48e29,7.99e25),(4095,100,12,2016,2.10e36,5.91e30)]:
+                                      (4095,80,12,2016,9.48e29,7.99e25),(4095,90,12,2016,1.41e33,2.27e28),(4095,100,12,2016,2.10e36,5.91e30)]:
         q = 2**b; rho = r/q; l = n//2
         tf = m*semicircle(l/m, rho); t = int(round(tf))
         lpP = prange_logp(m, n, rho, t)

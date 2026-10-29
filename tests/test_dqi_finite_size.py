@@ -71,9 +71,10 @@ def test_airy_law_on_fresh_points():
 def test_xp_trials_reproduce_paper():
     assert REDTEAM["xp_t2393"] == pytest.approx(1.97e23, rel=0.01)
     rows = json.load(open(ROOT / "dqi_verifiable" / "xp_table.json"))
-    assert len(rows) == 8
+    assert len(rows) == 10  # every row of Table VI
     for r in rows:
         assert float("%.3g" % r["xp_trials"]) == r["table_xp"]  # matches the published 3 significant figures
+        assert float("%.3g" % r["prange_trials"]) == r["table_prange"]
 
 
 def test_table_vi_overstatement_range():

@@ -1,6 +1,6 @@
 # Google's verifiable DQI instance: a finite-size correction
 
-> **Status:** Complete (October 2026) · re-derived independently and red-teamed · regression tests in [`tests/test_dqi_finite_size.py`](../tests/test_dqi_finite_size.py)
+> **Status:** Complete (October 2026) · re-derived independently and independently reviewed · paper is a preprint (not peer reviewed) · regression tests in [`tests/test_dqi_finite_size.py`](../tests/test_dqi_finite_size.py)
 >
 > **Paper:** [Finite-size corrections to the classical cost of a verifiable decoded-quantum-interferometry advantage](paper/main.pdf) ([LaTeX source](paper/main.tex))
 
@@ -20,9 +20,9 @@ The paper's asymptotic theorem is unaffected; only its concrete Table VI numbers
 
 **Finite-size score law.** For a DQI run with enhancing-polynomial weights w of degree ≤ ℓ, the model score law is π(s) = Binom(m, p)(s) · (Σₖ wₖ eₖ(s))², where eₖ are the Krawtchouk polynomials orthonormal under Binom(m, p) and p is the target density. Its mean is exact when 2ℓ + 1 is below the dual distance (n + 1). Its tail probabilities are exact for the paper's random-instance ensemble (averaged over the twist they agree to 10⁻¹⁴ at the Table VI instances), while an individual instance's tails fluctuate slightly around them (0.181–0.184 against 0.182 on small exhaustive instances; [`results/finite_size/score_law_check.json`](results/finite_size/score_law_check.json)). The paper's ℓ = n/2 is the borderline case, where the mean picks up a correction that exhaustive checks on tiny instances put within 0.016 ([`results/dqi_verifiable/`](results/dqi_verifiable/)); it is not bounded at the Table VI sizes. The mean-optimal w is the top eigenvector of an (ℓ+1)×(ℓ+1) Jacobi matrix, whose eigenvalue is the expected score; the tail-optimal w for P(s ≥ t) is the top eigenvector of a truncated Gram matrix.
 
-**Independent derivations.** The exact mean was first computed from the expected-score theorem of Jordan et al. ([`experiments/dqi_verifiable/dqi_exact_t.py`](experiments/dqi_verifiable/dqi_exact_t.py)). A red team then re-derived the full score law separately, from a multilinear identity on the constraint indicators, in 60-digit arithmetic ([`experiments/dqi_verifiable/r4_redteam_exact.py`](experiments/dqi_verifiable/r4_redteam_exact.py)). The production code ([`experiments/finite_size/dqi_core.py`](experiments/finite_size/dqi_core.py)) implements the red team's derivation in float64 with a log-scaled recurrence, for speed at large m. The tests check all three against each other.
+**Independent derivations.** I first computed the exact mean from the expected-score theorem of Jordan et al. ([`experiments/dqi_verifiable/dqi_exact_t.py`](experiments/dqi_verifiable/dqi_exact_t.py)). A separate review then re-derived the full score law from a multilinear identity on the constraint indicators, in 60-digit arithmetic ([`experiments/dqi_verifiable/r4_redteam_exact.py`](experiments/dqi_verifiable/r4_redteam_exact.py)). The production code ([`experiments/finite_size/dqi_core.py`](experiments/finite_size/dqi_core.py)) implements that derivation in float64 with a log-scaled recurrence, for speed at large m. The tests check all three against each other, and [`experiments/finite_size/score_law_check.py`](experiments/finite_size/score_law_check.py) checks the score law against the instance ensemble and against exhaustively enumerated small instances.
 
-**Classical cost.** XP trial counts are reproduced from the paper's formula by two separate codes, matching all eight Table VI rows checked to the paper's three significant figures (1.966×10²³ at the headline point; [`results/dqi_verifiable/xp_table.json`](results/dqi_verifiable/xp_table.json)).
+**Classical cost.** Both the XP and the plain Prange trial counts reproduce all ten rows of Table VI to the paper's three significant figures (1.966×10²³ XP trials at the headline point; [`experiments/dqi_verifiable/xp_formula.py`](experiments/dqi_verifiable/xp_formula.py), [`results/dqi_verifiable/xp_table.json`](results/dqi_verifiable/xp_table.json)). The headline count is also reproduced by the independent 60-digit code.
 
 **The fair comparison.** For each row, the paper's classical trial count at its target t is divided by the number of quantum runs needed to reach t once with the tail-optimal polynomial. That is the classical cost per quantum run; the published figure is larger by exactly that number of runs.
 
@@ -63,6 +63,10 @@ From this folder (Python 3, NumPy, SciPy, mpmath):
 ```
 python experiments/finite_size/airy_deficit.py          # Airy fit + corrected Table VI (~10 s)
 python experiments/finite_size/redesign.py              # cheapest redesign
+python experiments/finite_size/score_law_check.py       # score law vs instance ensemble and small instances
+python experiments/dqi_verifiable/xp_formula.py         # reproduce Table VI's XP and Prange counts (~20 s)
 python experiments/dqi_verifiable/r4_redteam_exact.py   # independent 60-digit re-derivation
 python experiments/dqi_verifiable/dqi_exact_t.py        # exact mean from the expected-score theorem
+python paper/make_numbers.py                            # regenerate every number and the table in the paper
+cd paper && latexmk -pdf main.tex                       # build the paper
 ```

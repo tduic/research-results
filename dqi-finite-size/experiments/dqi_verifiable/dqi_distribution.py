@@ -1,4 +1,4 @@
-"""DQI score distribution for OPI with |F|=r, perfect decoding (2l+1<d_perp regime; we also allow l=n/2 as the paper does).
+"""DQI score distribution for OPI with |F|=r, perfect decoding (2l+1<d_perp regime; l=n/2 also allowed as the paper does).
 DQI state  sum_x P(f(x))|x>.  If the score histogram of the instance is ~ q^n Binom(m,rho) (true for moments < d_perp),
 Pr_DQI[f=j] = P(j)^2 Binom(m,rho)(j) with P = sum_k w_k p_k (Krawtchouk orthonormal), w = top eigvec of the
 (l+1) Jacobi matrix.  Full Jacobi matrix (m+1) gives the quadrature nodes j=0..m exactly.
