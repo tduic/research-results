@@ -28,15 +28,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install LaTeX
-        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-science latexmk
-      - name: Build every paper
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils
+      - name: Build every paper and check the committed PDFs are current
         run: |
           for paper in */paper; do
             echo "::group::$paper"
+            cp "$paper/main.pdf" "$RUNNER_TEMP/committed.pdf"
             (cd "$paper" && latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex)
-            if grep -E "undefined|Citation .* undefined|Reference .* undefined" "$paper/main.log"; then exit 1; fi
+            if grep -E "undefined|Rerun to get" "$paper/main.log"; then exit 1; fi
+            pdftotext -layout "$RUNNER_TEMP/committed.pdf" "$RUNNER_TEMP/committed.txt"
+            pdftotext -layout "$paper/main.pdf" "$RUNNER_TEMP/built.txt"
+            if ! cmp -s "$RUNNER_TEMP/committed.txt" "$RUNNER_TEMP/built.txt"; then
+              echo "::error::$paper/main.pdf does not match its source; rebuild and commit it"
+              diff "$RUNNER_TEMP/committed.txt" "$RUNNER_TEMP/built.txt" | head -40
+              exit 1
+            fi
             echo "::endgroup::"
           done
+      - name: Build arXiv source bundles (standalone pdflatex, no BibTeX)
+        run: python3 tools/make_arxiv.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arxiv-bundles
+          path: |
+            dist/*-arxiv.tar.gz
+            dist/*-arxiv-metadata.txt
+            dist/*-arxiv-preview.pdf
 
   lean:
     runs-on: ubuntu-latest

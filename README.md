@@ -20,7 +20,7 @@ pip install numpy scipy mpmath pytest
 python -m pytest -q tests
 ```
 
-The tests re-derive the headline numbers (the DQI score law derived three ways and checked against the instance ensemble, the Airy law on fresh points outside its fitting range, every trifferent code re-checked triple by triple) and check the Lean sources and axiom reports. CI also builds the Lean proofs from scratch.
+The tests re-derive the headline numbers (the DQI score law derived three ways and checked against the instance ensemble, the Airy law on fresh points outside its fitting range, every trifferent code re-checked triple by triple) and check the Lean sources and axiom reports. CI also builds the Lean proofs and every paper from scratch, checks that the committed PDFs match their sources, and builds arXiv-ready source bundles (`python tools/make_arxiv.py`; downloadable from each CI run as the `arxiv-bundles` artifact).
 
 ## Contact
 

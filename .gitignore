@@ -13,3 +13,4 @@ __pycache__/
 *.log
 *.out
 *.synctex.gz
+dist/
