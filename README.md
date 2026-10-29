@@ -24,7 +24,7 @@ The tests re-derive the headline numbers (the DQI score law derived three ways a
 
 ## Contact
 
-Corrections and pointers to prior work are welcome — open an issue.
+Corrections and pointers to prior work are welcome — open an issue. Author: Tyler Duic, ORCID [0009-0005-4675-3045](https://orcid.org/0009-0005-4675-3045).
 
 ## License
 
