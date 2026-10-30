@@ -1,4 +1,4 @@
-"""Checks for dqi-finite-size/: the exact finite-size DQI score law, the Airy shortfall law,
+"""Result checks for this project: the exact finite-size DQI score law, the Airy shortfall law,
 the corrected Table VI ratios and the n = 96 redesign."""
 import json
 import math
@@ -12,7 +12,7 @@ import dqi_core
 import r4_redteam_exact as rt
 import airy_deficit as ta
 
-ROOT = Path(__file__).resolve().parent.parent / "dqi-finite-size" / "results"
+ROOT = Path(__file__).resolve().parent.parent / "results"
 TASK_A = json.load(open(ROOT / "finite_size" / "airy_deficit.json"))
 TASK_B = json.load(open(ROOT / "finite_size" / "redesign.json"))
 REDTEAM = json.load(open(ROOT / "dqi_verifiable" / "r4_redteam_exact.json"))
@@ -138,3 +138,17 @@ def test_boundary_mean_correction_small():
     rt = [abs(r["diff"]) for r in ratio["tiny"] if r["two_l_plus_1"] >= r["d_perp"]]
     assert rt and max(rt) < 0.016
     assert all(abs(r["diff"]) < 1e-9 for r in ratio["tiny"] if r["two_l_plus_1"] < r["d_perp"])
+
+
+def test_reproduce_comparison_catches_changes():
+    """Negative control for reproduce.py: a changed number, key or length is reported; float noise and timing are not."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("reproduce", Path(__file__).resolve().parent.parent / "reproduce.py")
+    rep = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rep)
+    a = {"x": 2359.747313752968, "rows": [1, 2.5], "secs": 5.0, "tag": "ok"}
+    assert list(rep.diff(a, {"x": 2359.747313752968 * (1 + 1e-13), "rows": [1, 2.5], "secs": 9.0, "tag": "ok"})) == []
+    assert list(rep.diff(a, {**a, "x": 2359.75}))
+    assert list(rep.diff(a, {**a, "rows": [1]}))
+    assert list(rep.diff(a, {**a, "tag": "changed"}))
+    assert list(rep.diff(a, {k: v for k, v in a.items() if k != "tag"}))

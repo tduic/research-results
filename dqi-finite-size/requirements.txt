@@ -1,0 +1,5 @@
+# Versions this result was verified with (Python 3.13). Newer versions should work too.
+numpy==2.5.3
+scipy==1.18.1
+mpmath==1.4.1
+pytest==9.1.1

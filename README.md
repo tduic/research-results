@@ -19,32 +19,39 @@ The papers are preprints: they have not been peer reviewed.
 
 I did this work with substantial help from AI models (Anthropic's Claude): searching, writing code and Lean proofs, and running the independent reviews described above. I directed the work and am responsible for every claim. That is why everything here is backed by code, data, tests and machine-checked proofs that anyone can rerun.
 
+## Verifying a result
+
+Each result is self-contained: its folder has its own dependencies (`requirements.txt`), tests, paper and a `verify.sh`, and nothing in it depends on the rest of the repository. To check one result you only need its folder:
+
+```
+git clone --filter=blob:none --sparse https://github.com/tduic/research-results
+cd research-results && git sparse-checkout set <result>    # e.g. dqi-finite-size
+cd <result> && python3 -m pip install -r requirements.txt
+./verify.sh                                                 # quick checks, seconds
+```
+
+`./verify.sh` takes a level: the default runs the quick checks, and each result's README lists the deeper ones — rerunning every computation from scratch and comparing with the committed outputs, rebuilding the Lean proofs, rebuilding the paper — with how long each takes.
+
+| Result | Quick | Deeper levels |
+|---|---|---|
+| [dqi-finite-size](dqi-finite-size/#verify-this-result) | ~10 s | `reproduce-fast` (~3 min), `reproduce` (~10 min), `paper` |
+| [trifferent-codes](trifferent-codes/#verify-this-result) | ~5 s | `lean` (~5 min), `paper` |
+
+CI does the same thing. Each result has its own workflow that checks out only that result's folder, which proves it stands alone. The workflow runs only when that folder changes, plus a weekly re-run. A small [repo-level workflow](.github/workflows/repo.yml) checks this README, the citation file and the folder structure, and [another](.github/workflows/arxiv.yml) builds arXiv-ready source bundles for every paper (`python tools/make_arxiv.py`).
+
 ## Layout
 
 ```
 <result>/
-  README.md        write-up: bottom line, method, results, caveats, how to reproduce
-  paper/           main.tex, references.bib, main.pdf (CI checks the PDF matches the source)
-  experiments/ or verification/   code behind every number
-  results/ or codes/, data/       outputs and inputs, as JSON
-  lean/            Lean 4 proofs (pinned Lake project), where a result is proved
-tests/             pytest suite run by CI: re-derives the headline numbers and ties each paper to its data
+  README.md        write-up: bottom line, method, results, caveats, how to verify
+  verify.sh        one command per verification level
+  requirements.txt pinned Python dependencies for this result only
+  tests/           this result's test suite
+  paper/           main.tex, references.bib, main.pdf
+  experiments/, results/, codes/, data/, verification/, lean/   code, outputs and proofs behind every number
+tests/             repository-level checks only
 tools/make_arxiv.py   builds standalone arXiv source bundles for every paper
 ```
-
-## Running the checks
-
-```
-pip install numpy scipy mpmath pytest
-python -m pytest -q tests
-```
-
-The tests re-derive the headline numbers and check the Lean sources and axiom reports. They cover the DQI score law, derived three ways and checked against the instance ensemble; all ten rows of Google's Table VI; the Airy law on fresh points outside its fitting range; and every trifferent code, re-checked triple by triple and rebuilt from the paper's description.
-
-On every push, CI also:
-- builds the Lean proofs and every paper from scratch;
-- checks that the committed PDFs match their sources;
-- builds arXiv-ready source bundles (`python tools/make_arxiv.py`), downloadable from each run as the `arxiv-bundles` artifact.
 
 ## Citing
 

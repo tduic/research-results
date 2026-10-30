@@ -1,0 +1,44 @@
+# Verifies trifferent-codes on its own: checks out only that folder, so it cannot depend on anything else.
+# The Lean build has its own workflow (trifferent-codes-lean.yml) so that edits elsewhere do not rebuild it.
+name: trifferent-codes
+
+on:
+  push:
+    paths: ["trifferent-codes/**", ".github/workflows/trifferent-codes.yml"]
+  pull_request:
+    paths: ["trifferent-codes/**", ".github/workflows/trifferent-codes.yml"]
+  schedule:
+    - cron: "23 6 * * 1"   # weekly re-verification
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: trifferent-codes
+
+jobs:
+  quick:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: trifferent-codes
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: trifferent-codes/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - run: ./verify.sh quick
+
+  paper:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: trifferent-codes
+      - name: Install LaTeX
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils
+      - run: ./verify.sh paper

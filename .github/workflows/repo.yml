@@ -1,0 +1,21 @@
+# Repository-level checks only (README table, CITATION.cff, folder structure). Each result has its own workflow.
+name: repo
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: python -m pip install pytest==9.1.1
+      - run: python -m pytest -q tests

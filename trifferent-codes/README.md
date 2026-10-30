@@ -35,14 +35,23 @@ Trifferent codes are exactly perfect hash families PHF(n; k, 3, 3), so I checked
 
 Lengths 13 and 18 are deliberately not listed: I also found codes of size 54 and 162 there, but those sizes equal the shortenings of known minimal linear codes, so they are not new bounds.
 
-## Reproducing
+## Verify this result
 
-From this folder:
+Everything needed is in this folder; you do not need the rest of the repository. To fetch only this folder:
 
 ```
-python -m pytest -q ../tests/test_trifference.py         # re-check codes, constructions, baseline and certificates
-python3 verification/constructions.py                     # rebuild every code from its algebraic description
-python3 -I verification/rt_check.py .                     # independent decoder + triple check
-cd lean && lake exe cache get && ./ci-build.sh            # Lean build (about 5 minutes after the Mathlib cache)
-cd paper && latexmk -pdf main.tex                         # build the paper
+git clone --filter=blob:none --sparse https://github.com/tduic/research-results
+cd research-results && git sparse-checkout set trifferent-codes && cd trifferent-codes
+python3 -m pip install -r requirements.txt
 ```
+
+Then pick how deep to go:
+
+| Command | What it checks | Time |
+|---|---|---|
+| `./verify.sh` | Every code re-checked triple by triple, rebuilt from its description in the paper and matched to its Lean certificate; the literature baseline recomputed; an independent decoder and triple check | ~5 s |
+| `./verify.sh lean` | Builds the Lean proofs from scratch (needs [elan](https://github.com/leanprover/elan)) and checks every theorem uses only the standard axioms | ~5 min after the Mathlib cache download |
+| `./verify.sh paper` | Rebuilds the paper (needs TeX Live) and checks the committed PDF matches its source | ~1 min |
+| `./verify.sh all` | All of the above | ~7 min |
+
+CI runs the same commands with a checkout of this folder only: [checks and paper](../.github/workflows/trifferent-codes.yml) on every change to the folder, and the [Lean build](../.github/workflows/trifferent-codes-lean.yml) when the proofs or codes change, plus weekly.

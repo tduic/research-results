@@ -56,17 +56,36 @@ Per-row numbers: [`results/finite_size/airy_deficit.json`](results/finite_size/a
 - Resource counts (Toffoli gates, logical qubits) for the redesigned instances are interpolated from the paper's own table (fit residuals below 0.1%), not compiled circuits.
 - The comparison assumes the attacker is measured against the score a quantum run actually reaches; other operational definitions of "advantage" shift the factor but not the conclusion that the asymptotic target is too generous at this size.
 
-## Reproducing
+## Verify this result
 
-From this folder (Python 3, NumPy, SciPy, mpmath):
+Everything needed is in this folder; you do not need the rest of the repository. To fetch only this folder:
 
 ```
-python experiments/finite_size/airy_deficit.py          # Airy fit + corrected Table VI (~10 s)
-python experiments/finite_size/redesign.py              # cheapest redesign
-python experiments/finite_size/score_law_check.py       # score law vs instance ensemble and small instances
-python experiments/dqi_verifiable/xp_formula.py         # reproduce Table VI's XP and Prange counts (~20 s)
-python experiments/dqi_verifiable/r4_redteam_exact.py   # independent 60-digit re-derivation
-python experiments/dqi_verifiable/dqi_exact_t.py        # exact mean from the expected-score theorem
-python paper/make_numbers.py                            # regenerate every number and the table in the paper
-cd paper && latexmk -pdf main.tex                       # build the paper
+git clone --filter=blob:none --sparse https://github.com/tduic/research-results
+cd research-results && git sparse-checkout set dqi-finite-size && cd dqi-finite-size
+python3 -m pip install -r requirements.txt
 ```
+
+Then pick how deep to go:
+
+| Command | What it checks | Time |
+|---|---|---|
+| `./verify.sh` | The test suite: the score law derived three ways and checked against the instance ensemble, all ten Table VI rows, the Airy law on fresh points, the n = 96 redesign, and that every number in the paper comes from `results/` | ~10 s |
+| `./verify.sh reproduce-fast` | Reruns every computation except the two slowest in a scratch copy and compares each output with the committed `results/` (relative tolerance 10⁻⁹) | ~3 min |
+| `./verify.sh reproduce` | The same for every computation, then regenerates the paper's numbers and table from the fresh results | ~10 min |
+| `./verify.sh paper` | Rebuilds the paper (needs TeX Live) and checks the committed PDF matches its source | ~1 min |
+| `./verify.sh all` | All of the above | ~12 min |
+
+To rerun a single computation: `python3 reproduce.py airy_deficit` (any part of a script name). The individual scripts:
+
+```
+experiments/finite_size/airy_deficit.py          # Airy fit + corrected Table VI
+experiments/finite_size/redesign.py              # cheapest redesign
+experiments/finite_size/score_law_check.py       # score law vs instance ensemble and small instances
+experiments/dqi_verifiable/xp_formula.py         # Table VI's XP and Prange counts
+experiments/dqi_verifiable/r4_redteam_exact.py   # independent 60-digit re-derivation
+experiments/dqi_verifiable/dqi_exact_t.py        # exact mean from the expected-score theorem
+paper/make_numbers.py                            # every number and the table in the paper
+```
+
+CI runs the same commands on every change to this folder, with a checkout of this folder only ([workflow](../.github/workflows/dqi-finite-size.yml)).

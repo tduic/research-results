@@ -1,0 +1,29 @@
+# Builds standalone arXiv source bundles for every paper (downloadable as the arxiv-bundles artifact).
+name: arxiv bundles
+
+on:
+  push:
+    paths: ["*/paper/**", "tools/make_arxiv.py", ".github/workflows/arxiv.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install LaTeX
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-science latexmk
+      - run: python3 tools/make_arxiv.py
+      - uses: actions/upload-artifact@v7
+        with:
+          name: arxiv-bundles
+          path: |
+            dist/*-arxiv.tar.gz
+            dist/*-arxiv-metadata.txt
+            dist/*-arxiv-preview.pdf

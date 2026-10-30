@@ -1,0 +1,32 @@
+# Builds the trifferent-codes Lean proofs from scratch and checks their axioms.
+# Runs when the proofs or the codes they certify change, and weekly.
+name: trifferent-codes (Lean)
+
+on:
+  push:
+    paths: ["trifferent-codes/lean/**", "trifferent-codes/codes/**", "trifferent-codes/verify.sh", ".github/workflows/trifferent-codes-lean.yml"]
+  pull_request:
+    paths: ["trifferent-codes/lean/**", "trifferent-codes/codes/**", "trifferent-codes/verify.sh", ".github/workflows/trifferent-codes-lean.yml"]
+  schedule:
+    - cron: "41 6 * * 1"   # weekly re-verification
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: trifferent-codes
+
+jobs:
+  lean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: trifferent-codes
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/v4.1.2/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - run: ./verify.sh lean

@@ -1,6 +1,6 @@
-"""Checks for trifferent-codes/.
+"""Result checks for this project.
 
-Re-checks every code in trifferent-codes/codes/ (all triples separated) and recomputes
+Re-checks every code in codes/ (all triples separated) and recomputes
 the published baseline as the closure of known values under T(n) >= T(n-1) + 1
 and shortening T(n-1) >= ceil(2 T(n) / 3), asserting exactly which bounds are new.
 """
@@ -11,12 +11,13 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-CODES = sorted((Path(__file__).resolve().parent.parent / "trifferent-codes" / "codes").glob("code_n*_M*.json"))
+PROJECT = Path(__file__).resolve().parent.parent
+CODES = sorted((PROJECT / "codes").glob("code_n*_M*.json"))
 
-KNOWN = {1: 3, 2: 4, 3: 6, 4: 9, 5: 10, 6: 13, 7: 16, 8: 20, 9: 27,   # Kurz 2023 (exact)
+KNOWN = {1: 3, 2: 4, 3: 6, 4: 9, 5: 10, 6: 13, 7: 16, 8: 20, 9: 27,   # Della Fiore-Gnutti-Polak 2022, Kurz 2024 (exact)
          14: 81, 19: 243, 21: 243, 22: 243, 24: 729}                    # minimal linear codes (BDGP)
-# Walker-Colbourn 2007 Table 6 (best known PHF(N; k, 3, 3), N = 1..24; see trifferent-codes/data/)
-WC2007 = {int(n): v[0] for n, v in json.load(open(Path(__file__).resolve().parent.parent / "trifferent-codes" / "data" / "walker_colbourn_2007_table6.json"))["rho"].items()}
+# Walker-Colbourn 2007 Table 6 (best known PHF(N; k, 3, 3), N = 1..24; see data/)
+WC2007 = {int(n): v[0] for n, v in json.load(open(PROJECT / "data" / "walker_colbourn_2007_table6.json"))["rho"].items()}
 CLAIMED_NEW = {10: 30, 11: 36, 12: 48, 16: 108, 17: 109}
 MATCHED = {13: 54, 18: 162}  # bounds that equal the published closure (shortenings of minimal codes)
 
@@ -75,7 +76,7 @@ def test_baseline_closure_and_novelty():
     assert codes == CLAIMED_NEW
 
 
-LEAN = Path(__file__).resolve().parent.parent / "trifferent-codes" / "lean"
+LEAN = PROJECT / "lean"
 BANNED = ["sorry", "admit", "native_decide", "implemented_by", "@[extern]", "unsafe", "ofReduceBool"]
 
 
@@ -110,7 +111,7 @@ def test_paper_constructions_regenerate_codes():
     """The compact descriptions printed in the paper rebuild exactly the shipped codes."""
     import importlib.util
     spec = importlib.util.spec_from_file_location(
-        "constructions", Path(__file__).resolve().parent.parent / "trifferent-codes" / "verification" / "constructions.py")
+        "constructions", PROJECT / "verification" / "constructions.py")
     con = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(con)
     built = con.all_codes()

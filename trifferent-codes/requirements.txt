@@ -1,0 +1,4 @@
+# Versions this result was verified with (Python 3.13). Newer versions should work too.
+# The Lean proofs need elan (https://github.com/leanprover/elan); lean/lean-toolchain pins Lean itself.
+numpy==2.5.3
+pytest==9.1.1
