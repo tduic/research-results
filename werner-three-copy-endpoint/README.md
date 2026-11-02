@@ -10,7 +10,7 @@
 
 For $C$ an operator on $(\mathbb{C}^d)^{\otimes 3}$ of rank at most $2$, let
 
-$$q_\alpha(C) = \sum_{S \subseteq \{1,2,3\}} (-\alpha)^{|S|} \lVert \operatorname{Tr}_S C \rVert_F^2, \qquad q = q_{1/2}.$$
+$$q_\alpha(C) = \sum_{S \subseteq \{1,2,3\}} (-\alpha)^{|S|} \lVert \mathrm{Tr}_S C \rVert_F^2, \qquad q = q_{1/2}.$$
 
 The Werner state $\rho_\alpha \propto I - \alpha F$ is three-copy undistillable exactly when $q_\alpha \ge 0$ on rank-$\le 2$ operators $C$. By the continuation identity, $q_\alpha \ge (1-2\alpha)(1-\alpha)^2 \lVert C \rVert^2$ on $[0, 1/2]$ holds in dimension $d$ exactly when the endpoint $q \ge 0$ holds there. The endpoint is therefore the sharp three-copy statement: it settles three-copy undistillability up to the one-copy threshold.
 
