@@ -66,7 +66,7 @@ def abstract_text(paper):
     a = re.sub(r"\$([0-9.,%()–\s]+)\$", r"\1", a)
     a = a.replace("$–$", "–")
     a = re.sub(r"\$n=([0-9]+)\$", r"n = \1", a)
-    assert not re.search(r"\\(?!mathbb|times|ge|le|ldots|dots|subseteq|mathrm|in|setminus|lceil|rceil)[A-Za-z]+", a), a
+    assert not re.search(r"\\(?!mathbb|times|ge|le|ldots|dots|subseteq|mathrm|in|setminus|lceil|rceil|C|otimes|sum|lVert|rVert|Tr|cite|texttt|to)[A-Za-z]+", a), a
     return a
 
 
