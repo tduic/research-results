@@ -1,0 +1,5 @@
+{
+ "max_relative_difference": "3e-15",
+ "verdict": "faithful",
+ "sanity_d1": "q = ||c||^2/8"
+}
