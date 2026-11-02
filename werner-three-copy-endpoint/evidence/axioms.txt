@@ -1,0 +1,6 @@
+'LayerDT0.identityT0' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LayerDT0.werner3_endpoint_all_d' depends on axioms: [propext, Classical.choice, Quot.sound]
+
+These are the standard Lean/Mathlib axioms. No new axioms are listed.
+The `lean` level of verify.sh rebuilds the proof and re-checks these
+axiom lists from an actual build.
