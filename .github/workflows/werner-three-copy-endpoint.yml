@@ -6,6 +6,7 @@ name: werner-three-copy-endpoint
 
 on:
   push:
+    branches: [main]
     paths: ["werner-three-copy-endpoint/**", ".github/workflows/werner-three-copy-endpoint.yml"]
   pull_request:
     paths: ["werner-three-copy-endpoint/**", ".github/workflows/werner-three-copy-endpoint.yml"]
@@ -16,6 +17,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 defaults:
   run:
     working-directory: werner-three-copy-endpoint
@@ -23,6 +28,7 @@ defaults:
 jobs:
   quick:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
@@ -38,6 +44,7 @@ jobs:
 
   paper:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
         with:
