@@ -1,0 +1,9 @@
+# block 834 part 2 (coupled c3, family 22, B_u rank 12, B_v rank 13 of n = 22): re-presented with full-rank bases
+# (recompress.py, case "left": Y = L_b I (R_b Z_0^T)^T, r = 12), paired with its negation, reduced totals
+# (gen_asm.py C834 22 rzero 834:2); C834 proves famZero (re-presented parts) and famZeroO (the parts as given)
+LayerDProto.Gen.C834Pos
+LayerDProto.Gen.C834Orb
+LayerDProto.Gen.C834P0
+LayerDProto.Gen.C834P1
+LayerDProto.Gen.C834K
+LayerDProto.Gen.C834

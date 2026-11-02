@@ -1,0 +1,8 @@
+# block 999 part 2 (coupled c23, family 22, B_v = 0: a vanishing part, Y = 0), re-presented (recompress.py case "zero":
+# k = 1, L = R = 0, Z = [[0]], fold data Q = R = I), paired with its negation, reduced totals (gen_asm.py Z999 22 rzero 999:2)
+LayerDProto.Gen.Z999Pos
+LayerDProto.Gen.Z999Orb
+LayerDProto.Gen.Z999P0
+LayerDProto.Gen.Z999P1
+LayerDProto.Gen.Z999K
+LayerDProto.Gen.Z999

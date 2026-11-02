@@ -1,0 +1,7 @@
+# block 495 (w22 (0,2)) paired with its negation, reduced totals (gen_asm.py R495 22 rzero 495:0)
+LayerDProto.Gen.R495Pos
+LayerDProto.Gen.R495Orb
+LayerDProto.Gen.R495P0
+LayerDProto.Gen.R495P1
+LayerDProto.Gen.R495K
+LayerDProto.Gen.R495
