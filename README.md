@@ -39,7 +39,7 @@ cd <result> && python3 -m pip install -r requirements.txt
 | [trifferent-codes](trifferent-codes/#verify-this-result) | ~5 s | `lean` (~5 min), `paper` |
 | [werner-three-copy-endpoint](werner-three-copy-endpoint/#verify-this-result) | ~2-3 min | `paper` (~1 min), `lean` (~12 h wall, manual only, not run by CI) |
 
-CI does the same thing. Each result has its own workflow that checks out only that result's folder, which proves it stands alone. The workflow runs only when that folder changes, plus a weekly re-run. A small [repo-level workflow](.github/workflows/repo.yml) checks this README, the citation file and the folder structure, and [another](.github/workflows/arxiv.yml) builds arXiv-ready source bundles for every paper (`python tools/make_arxiv.py`).
+CI does the same thing. Each result has its own workflows that check out only that result's folder, which proves it stands alone: a code workflow for tests and reproductions, and a paper workflow for rebuilding the paper. Each runs only when its part of the folder changes, plus a weekly re-run, and a docs-only change to a result runs only the repo-level checks. A small [repo-level workflow](.github/workflows/repo.yml) checks this README, the citation file and the folder structure, and [another](.github/workflows/arxiv.yml) builds arXiv-ready source bundles for every paper (`python tools/make_arxiv.py`).
 
 ## Layout
 
