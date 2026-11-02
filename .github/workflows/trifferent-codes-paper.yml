@@ -1,0 +1,36 @@
+# Rebuilds the trifferent-codes paper on its own: checks out only that folder, so it cannot depend on anything else.
+# Split from trifferent-codes.yml so a paper-only change does not run quick.
+name: trifferent-codes (paper)
+
+on:
+  push:
+    branches: [main]
+    paths: ["trifferent-codes/paper/**", ".github/workflows/trifferent-codes-paper.yml"]
+  pull_request:
+    paths: ["trifferent-codes/paper/**", ".github/workflows/trifferent-codes-paper.yml"]
+  schedule:
+    - cron: "23 6 * * 1"   # weekly re-verification
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+defaults:
+  run:
+    working-directory: trifferent-codes
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: trifferent-codes
+      - name: Install LaTeX
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils
+      - run: ./verify.sh paper
