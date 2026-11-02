@@ -28,6 +28,10 @@ META = {
         categories="math.CO (primary); cross-list cs.IT, math.IT",
         comments="4 pages, 1 table. Explicit codes and Lean 4 proofs: https://github.com/tduic/research-results/tree/main/trifferent-codes",
         msc="05B30 (primary); 94B25, 68R05", acm=""),
+    "werner-three-copy-endpoint": dict(
+        categories="quant-ph (primary)",
+        comments="4 pages. Complete kernel-only Lean 4 proof of the three-copy Werner endpoint for every dimension: https://github.com/tduic/research-results/tree/main/werner-three-copy-endpoint",
+        msc="", acm=""),
 }
 
 
