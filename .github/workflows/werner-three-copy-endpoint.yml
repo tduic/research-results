@@ -2,14 +2,16 @@
 # folder, so it cannot depend on anything else. No Lean job by design:
 # the full Lean rebuild is a manual level of verify.sh (about 12 hours),
 # not a CI job.
+# The paper rebuild has its own workflow (werner-three-copy-endpoint-paper.yml)
+# so that a paper-only or docs-only change does not run this job.
 name: werner-three-copy-endpoint
 
 on:
   push:
     branches: [main]
-    paths: ["werner-three-copy-endpoint/**", ".github/workflows/werner-three-copy-endpoint.yml"]
+    paths: ["werner-three-copy-endpoint/**", "!werner-three-copy-endpoint/paper/**", "!werner-three-copy-endpoint/**.md", ".github/workflows/werner-three-copy-endpoint.yml"]
   pull_request:
-    paths: ["werner-three-copy-endpoint/**", ".github/workflows/werner-three-copy-endpoint.yml"]
+    paths: ["werner-three-copy-endpoint/**", "!werner-three-copy-endpoint/paper/**", "!werner-three-copy-endpoint/**.md", ".github/workflows/werner-three-copy-endpoint.yml"]
   schedule:
     - cron: "31 6 * * 1"   # weekly re-verification
   workflow_dispatch:
@@ -41,17 +43,3 @@ jobs:
       - run: python -m pip install -r requirements.txt
       - run: python -m pip install pytest==9.1.1
       - run: bash verify.sh quick
-
-  paper:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          sparse-checkout: werner-three-copy-endpoint
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.13"
-      - name: Install LaTeX
-        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils
-      - run: bash verify.sh paper
