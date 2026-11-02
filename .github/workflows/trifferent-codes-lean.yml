@@ -4,6 +4,7 @@ name: trifferent-codes (Lean)
 
 on:
   push:
+    branches: [main]
     paths: ["trifferent-codes/lean/**", "trifferent-codes/codes/**", "trifferent-codes/verify.sh", ".github/workflows/trifferent-codes-lean.yml"]
   pull_request:
     paths: ["trifferent-codes/lean/**", "trifferent-codes/codes/**", "trifferent-codes/verify.sh", ".github/workflows/trifferent-codes-lean.yml"]
@@ -14,6 +15,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 defaults:
   run:
     working-directory: trifferent-codes
@@ -21,6 +26,7 @@ defaults:
 jobs:
   lean:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
         with:
