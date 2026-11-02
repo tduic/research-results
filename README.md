@@ -6,7 +6,7 @@ Finished results from my research, published once they have cleared the full ver
 |---|---|---|---|
 | [**DQI finite-size correction**](dqi-finite-size/) | Quantum advantage | Google's verifiable DQI instance overstates its classical gap 14–18.5× per quantum run across its whole resource table (16.8× at the headline instance). A finite-size law built on the Airy edge asymptotic predicts DQI's shortfall within 4.3%; an n = 96 instance (~9.1M Toffoli per run, 2,510 logical qubits) restores the claimed margin. | [PDF](dqi-finite-size/paper/main.pdf) |
 | [**Trifferent codes**](trifferent-codes/) | Combinatorics | New lower bounds T(10) ≥ 30, T(11) ≥ 36, T(12) ≥ 48, T(16) ≥ 108, T(17) ≥ 109, each above every bound I found in the literature, with every code verified in Lean 4. | [PDF](trifferent-codes/paper/main.pdf) |
-| [**Three-copy Werner endpoint**](werner-three-copy-endpoint/) | Quantum information | A complete kernel-only Lean proof of the three-copy Werner endpoint for every dimension. The theorem itself is Tomar's (2026); the contribution is the first complete kernel-only Lean proof for every $d$, closing the formalization gap at $d \ge 9$. | [PDF](werner-three-copy-endpoint/paper/main.pdf) |
+| [**Three-copy Werner endpoint**](werner-three-copy-endpoint/) | Quantum information | A complete kernel-only Lean proof of the three-copy Werner endpoint for every dimension, by a self-contained route that does not use Tomar's certificate or argument. The theorem itself was proved by Tomar (2026); the contribution is the first complete kernel-only Lean proof for every $d$, closing the formalization gap at $d \ge 9$. | [PDF](werner-three-copy-endpoint/paper/main.pdf) |
 
 The papers are preprints: they have not been peer reviewed.
 
@@ -37,6 +37,7 @@ cd <result> && python3 -m pip install -r requirements.txt
 |---|---|---|
 | [dqi-finite-size](dqi-finite-size/#verify-this-result) | ~10 s | `reproduce-fast` (~3 min), `reproduce` (~10 min), `paper` |
 | [trifferent-codes](trifferent-codes/#verify-this-result) | ~5 s | `lean` (~5 min), `paper` |
+| [werner-three-copy-endpoint](werner-three-copy-endpoint/#verify-this-result) | ~2-3 min | `paper` (~1 min), `lean` (~12 h wall, manual only, not run by CI) |
 
 CI does the same thing. Each result has its own workflow that checks out only that result's folder, which proves it stands alone. The workflow runs only when that folder changes, plus a weekly re-run. A small [repo-level workflow](.github/workflows/repo.yml) checks this README, the citation file and the folder structure, and [another](.github/workflows/arxiv.yml) builds arXiv-ready source bundles for every paper (`python tools/make_arxiv.py`).
 
