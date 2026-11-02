@@ -34,3 +34,12 @@ references:
     year: 2026
     notes: "Preprint. Codes and Lean 4 proofs: trifferent-codes/"
     url: "https://github.com/tduic/research-results/blob/main/trifferent-codes/paper/main.pdf"
+  - type: unpublished
+    title: "A complete kernel-only Lean proof of the three-copy Werner endpoint for every dimension"
+    authors:
+      - family-names: Duic
+        given-names: Tyler
+        orcid: "https://orcid.org/0009-0005-4675-3045"
+    year: 2026
+    notes: "Preprint. Lean 4 proof, certificate and verifier: werner-three-copy-endpoint/"
+    url: "https://github.com/tduic/research-results/blob/main/werner-three-copy-endpoint/paper/main.pdf"

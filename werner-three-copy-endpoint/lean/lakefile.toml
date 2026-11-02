@@ -1,0 +1,23 @@
+name = "WernerEndpoint"
+defaultTargets = ["WernerEndpoint"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "v4.24.0"
+
+[[lean_lib]]
+name = "WernerEndpoint"
+
+# Layer D prototype (kernel-cost experiments). Not a default target: build modules
+# one at a time with layerD_proto/run_bench.sh (see layerD_proto/README.md).
+[[lean_lib]]
+name = "LayerDProto"
+srcDir = "layerD_proto"
+moreLeanArgs = ["--tstack=1000000", "--memory=2500"]
+
+# Layer D for the t = 0 certificate (all d). Not a default target: see layerD_t0/README.md.
+[[lean_lib]]
+name = "LayerDT0"
+srcDir = "layerD_t0"
+moreLeanArgs = ["--tstack=1000000"]
