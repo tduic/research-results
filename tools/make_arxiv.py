@@ -7,8 +7,13 @@ For each <result>/paper/ this:
      undefined citation or reference;
   4. writes dist/<result>-arxiv.tar.gz and dist/<result>-arxiv-metadata.txt.
 
-Usage (from the repo root):  python tools/make_arxiv.py
+Usage (from the repo root):  python tools/make_arxiv.py [result ...]
+
+With no arguments, build every paper. With result names, build only those results'
+papers (used by .github/workflows/arxiv.yml so a paper change rebuilds only that
+paper's bundle, not every paper in the repo).
 """
+import os
 import re
 import shutil
 import subprocess
@@ -103,12 +108,68 @@ def build(paper):
     print(f"{name}: {tarball.relative_to(ROOT)} ({tarball.stat().st_size // 1024} KB), files: {files}")
 
 
-def main():
-    DIST.mkdir(exist_ok=True)
+def select_papers(names):
     papers = sorted(p for p in ROOT.glob("*/paper") if (p / "main.tex").exists())
     if not papers:
         raise SystemExit("no papers found")
-    for p in papers:
+    if not names:
+        return papers
+    wanted = set(names)
+    selected = [p for p in papers if p.parent.name in wanted]
+    unknown = wanted - {p.parent.name for p in papers}
+    if unknown:
+        raise SystemExit(f"unknown result(s): {', '.join(sorted(unknown))}")
+    return selected
+
+
+def ci_changed_papers():
+    """Paper folders changed in a CI push, or None to build everything.
+
+    Reads the push payload GitHub Actions provides (GITHUB_EVENT_PATH: before/sha)
+    and diffs those commits. Returns None when not in CI, on a manual run, on a
+    first push, on any git failure, or when the script/workflow itself changed
+    (then building everything is the safe test that the script still works).
+    This is what makes arxiv bundles build only changed papers without needing
+    a workflow-file change.
+    """
+    if os.environ.get("GITHUB_EVENT_NAME") != "push":
+        return None
+    path = os.environ.get("GITHUB_EVENT_PATH")
+    if not path:
+        return None
+    try:
+        import json as _json
+        with open(path) as f:
+            ev = _json.load(f)
+        before, sha = ev.get("before"), ev.get("after") or ev.get("head_commit", {}).get("id")
+    except Exception:
+        return None
+    if not before or set(before) == {"0"} or not sha:
+        return None
+    try:
+        out = subprocess.run(["git", "diff", "--name-only", before, sha],
+                             cwd=ROOT, capture_output=True, text=True, check=True).stdout
+    except Exception:
+        return None
+    changed = out.splitlines()
+    if any(c.startswith(("tools/", ".github/")) for c in changed):
+        return None
+    papers = sorted({c.split("/", 1)[0] for c in changed
+                     if "/" in c and (ROOT / c.split("/", 1)[0] / "paper" / "main.tex").exists()})
+    return papers
+
+
+def main():
+    DIST.mkdir(exist_ok=True)
+    if sys.argv[1:]:
+        names = sys.argv[1:]
+    else:
+        changed = ci_changed_papers()
+        names = changed if changed is not None else []
+        if changed is not None and not changed:
+            print("no paper folder changed in this push; nothing to bundle")
+            return
+    for p in select_papers(names):
         build(p)
 
 
