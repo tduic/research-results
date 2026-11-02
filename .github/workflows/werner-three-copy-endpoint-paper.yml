@@ -1,0 +1,40 @@
+# Rebuilds the werner-three-copy-endpoint paper on its own: checks out only that
+# folder, so it cannot depend on anything else.
+# Split from werner-three-copy-endpoint.yml so a paper-only change does not run quick.
+name: werner-three-copy-endpoint (paper)
+
+on:
+  push:
+    branches: [main]
+    paths: ["werner-three-copy-endpoint/paper/**", ".github/workflows/werner-three-copy-endpoint-paper.yml"]
+  pull_request:
+    paths: ["werner-three-copy-endpoint/paper/**", ".github/workflows/werner-three-copy-endpoint-paper.yml"]
+  schedule:
+    - cron: "31 6 * * 1"   # weekly re-verification
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+defaults:
+  run:
+    working-directory: werner-three-copy-endpoint
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: werner-three-copy-endpoint
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install LaTeX
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils
+      - run: bash verify.sh paper
