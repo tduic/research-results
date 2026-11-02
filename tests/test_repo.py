@@ -1,4 +1,5 @@
 """Repository-level checks only. Each result's own checks live in <result>/tests and run on their own."""
+import ast
 import re
 from pathlib import Path
 
@@ -54,3 +55,23 @@ def test_citation_file_lists_every_paper():
         title = " ".join(re.search(r"\\title\{(.*?)\}\n", tex, re.S).group(1).replace("\\\\", " ").split())
         assert f'title: "{title}"' in cff, title
         assert f"{name}/paper/main.pdf" in cff
+
+
+def test_arxiv_meta_lists_every_paper():
+    """tools/make_arxiv.py must have a META entry for every paper folder.
+
+    Without one, the arxiv-bundles job fails on that result (KeyError) only
+    after the TeX install, so catch it here in the fast repo checks instead.
+    Parsed with ast, not imported, so the script's build code never runs.
+    """
+    tree = ast.parse((ROOT / "tools" / "make_arxiv.py").read_text())
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Assign)
+            and any(isinstance(t, ast.Name) and t.id == "META" for t in node.targets)
+            and isinstance(node.value, ast.Dict)
+        ):
+            keys = sorted(k.value for k in node.value.keys if isinstance(k, ast.Constant))
+            assert keys == FOLDERS, (keys, FOLDERS)
+            return
+    raise AssertionError("no META dict found in tools/make_arxiv.py")
