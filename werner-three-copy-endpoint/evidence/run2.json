@@ -1,0 +1,26 @@
+{
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "container": "one 8-CPU, 9 GB container",
+  "container_cpus": 8,
+  "container_mem_gb": 9,
+  "cpu_hours": "18.0",
+  "finished_utc": "2026-11-02T10:29:39Z",
+  "job": "t0full",
+  "light_retries_killed_for_memory": 62,
+  "modules_before_rep_split": 8110,
+  "modules_final": 216,
+  "modules_heavy": 145,
+  "modules_light": 7829,
+  "modules_prep": 9,
+  "modules_total": 8199,
+  "peak_memory_gb": "6.40",
+  "peak_module": "F31.P576x1",
+  "run_id": "41356979845",
+  "source_summary": "Summary of the recorded build run, transcribed from its run summary in this folder (evidence/run2-summary.md). It is not itself a build log; the lean level of verify.sh rebuilds the proof and re-checks the axioms.",
+  "started_utc": "2026-11-01T22:26:47Z",
+  "wall": "12 h 3 min"
+}
