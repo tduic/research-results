@@ -1,0 +1,11 @@
+# Pinned requirements for this result. Python itself: 3.11+.
+# Quick and paper checks need only the standard library.
+# The standalone certificate verifier needs numpy (any recent 2.x).
+numpy==2.2.6
+# Paper build (verify.sh paper) needs a TeX Live install with latexmk;
+# that is a system package, not a pip package, and is not listed here.
+# Lean build (verify.sh lean, manual only) needs elan (Lean v4.24.0,
+# Mathlib v4.24.0, pinned in lean/lake-manifest.json) plus the
+# generator dependencies below (the identity-module generators use
+# sympy for exact integer matrix work).
+sympy==1.13.3
