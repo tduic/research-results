@@ -54,6 +54,68 @@ def expand_macros(text, numbers):
     return text
 
 
+# Commands safe to leave in an arXiv metadata abstract. This is the full
+# set, defined once: standard LaTeX math symbols, Greek letters, operators,
+# relations, arrows, delimiters, font and text commands, and citation and
+# reference commands. Single-letter commands (for example \\C, \\R, \\N for
+# number fields) are also allowed, since they are the usual field shorthands.
+# Deliberately NOT in this set, so they still fail loudly instead of
+# shipping broken metadata: anything that defines or pulls in content
+# (\\def, \\newcommand, \\renewcommand, \\input, \\include,
+# \\usepackage, \\begin, \\end) and any other multi-letter command,
+# which is a custom macro the metadata builder does not know how to handle.
+SAFE_ABSTRACT_COMMANDS = frozenset({
+    # Greek letters
+    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
+    "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma",
+    "tau", "upsilon", "phi", "chi", "psi", "omega",
+    "varepsilon", "vartheta", "varpi", "varrho", "varsigma", "varphi",
+    "Gamma", "Delta", "Theta", "Lambda", "Xi", "Pi", "Sigma", "Upsilon",
+    "Phi", "Psi", "Omega",
+    # Operators and functions
+    "sum", "prod", "int", "iint", "iiint", "oint", "lim", "limsup",
+    "liminf", "sup", "inf", "min", "max", "arg", "det", "gcd", "deg",
+    "dim", "ker", "hom", "sin", "cos", "tan", "cot", "sec", "csc",
+    "sinh", "cosh", "tanh", "coth", "arcsin", "arccos", "arctan",
+    "log", "ln", "lg", "exp", "Pr", "Tr", "tr", "rank", "trace", "diag",
+    # Relations
+    "le", "leq", "ge", "geq", "ne", "neq", "equiv", "approx", "cong",
+    "sim", "simeq", "propto", "ll", "gg", "prec", "succ", "preceq",
+    "succeq", "subset", "subseteq", "supset", "supseteq", "sqsubset",
+    "sqsupset", "sqsubseteq", "sqsupseteq", "in", "ni", "notin", "owns",
+    "mid", "parallel", "perp", "models", "vdash", "dashv", "asymp",
+    "doteq", "triangleq", "coloneq",
+    # Binary operators and symbols
+    "pm", "mp", "times", "div", "cdot", "ast", "star", "circ", "bullet",
+    "oplus", "ominus", "otimes", "oslash", "odot", "cup", "cap",
+    "setminus", "wedge", "vee", "neg", "partial", "nabla", "infty",
+    "aleph", "hbar", "ell", "emptyset", "varnothing", "forall",
+    "exists", "top", "bot", "wr", "bigcup", "bigcap", "bigoplus",
+    "bigotimes", "bigvee", "bigwedge", "sqcup", "sqcap", "uplus",
+    "amalg", "diamond", "bigtriangleup", "bigtriangledown", "triangle",
+    "clubsuit", "diamondsuit", "heartsuit", "spadesuit",
+    # Arrows
+    "to", "rightarrow", "leftarrow", "Rightarrow", "Leftarrow",
+    "leftrightarrow", "Leftrightarrow", "mapsto", "longrightarrow",
+    "longleftarrow", "longmapsto", "hookrightarrow", "hookleftarrow",
+    "uparrow", "downarrow", "Uparrow", "Downarrow", "nearrow",
+    "searrow", "swarrow", "nwarrow", "rightleftharpoons",
+    # Delimiters
+    "lVert", "rVert", "lvert", "rvert", "langle", "rangle", "lfloor",
+    "rfloor", "lceil", "rceil", "lbrace", "rbrace", "Vert", "vert",
+    # Fonts, accents, and text
+    "mathbb", "mathcal", "mathbf", "mathrm", "mathit", "mathsf",
+    "mathfrak", "mathscr", "text", "textbf", "textit", "texttt",
+    "textsc", "emph", "overline", "underline", "hat", "widehat",
+    "tilde", "widetilde", "bar", "vec", "dot", "ddot", "acute",
+    "grave", "check", "breve", "quad", "qquad",
+    # Dots and ellipses
+    "ldots", "cdots", "vdots", "ddots", "dots",
+    # Citations and references
+    "cite", "citet", "citep", "ref", "eqref",
+})
+
+
 def abstract_text(paper):
     tex = (paper / "main.tex").read_text()
     a = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", tex, re.S).group(1)
@@ -66,7 +128,8 @@ def abstract_text(paper):
     a = re.sub(r"\$([0-9.,%()–\s]+)\$", r"\1", a)
     a = a.replace("$–$", "–")
     a = re.sub(r"\$n=([0-9]+)\$", r"n = \1", a)
-    assert not re.search(r"\\(?!mathbb|times|ge|le|ldots|dots|subseteq|mathrm|in|setminus|lceil|rceil|C|otimes|sum|lVert|rVert|Tr|cite|texttt|to)[A-Za-z]+", a), a
+    for _cmd in re.findall(r"\\([A-Za-z]+)", a):
+        assert len(_cmd) == 1 or _cmd in SAFE_ABSTRACT_COMMANDS, a
     return a
 
 
