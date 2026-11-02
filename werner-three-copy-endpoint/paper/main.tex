@@ -33,7 +33,7 @@ I prove nothing new about Werner states in this note: the endpoint was
 already proved for every $d \ge 3$ by Tomar~\cite{tomar2026}, whose Lean
 formalization covers $3 \le d \le 8$ only.
 What I contribute is a complete kernel-only Lean~4 proof of the endpoint
-for every $d$, by an independent route: one exact rational certificate of
+for every $d$, by an independent, self-contained route: one exact rational certificate of
 the $t = 1/d \to 0$ limit of a strengthened moment relaxation, carried to
 every dimension by a lemma chain, with the certificate's exact identity
 proved in the Lean kernel.
@@ -68,7 +68,9 @@ That paper is a preprint, not peer reviewed, and its Lean formalization
 covers $3 \le d \le 8$ only: the paper states that
 ``the case $d \ge 9$ is not formalized''.
 I close that formalization gap, by a different certificate route, and I
-claim nothing else as new.
+claim nothing else as new. This proof does not use Tomar's certificate
+or argument as a step; it proves the endpoint from the $t = 0$ certificate
+and lemma chain in this note.
 
 \begin{theorem}\label{thm:main}
 For every $d$ and every operator $C$ on $(\C^d)^{\otimes 3}$ of rank at
