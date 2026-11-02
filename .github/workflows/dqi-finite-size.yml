@@ -3,6 +3,7 @@ name: dqi-finite-size
 
 on:
   push:
+    branches: [main]
     paths: ["dqi-finite-size/**", ".github/workflows/dqi-finite-size.yml"]
   pull_request:
     paths: ["dqi-finite-size/**", ".github/workflows/dqi-finite-size.yml"]
@@ -13,6 +14,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 defaults:
   run:
     working-directory: dqi-finite-size
@@ -20,6 +25,7 @@ defaults:
 jobs:
   quick:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
@@ -34,6 +40,7 @@ jobs:
 
   reproduce:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
         with:
@@ -48,6 +55,7 @@ jobs:
 
   paper:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
         with:
