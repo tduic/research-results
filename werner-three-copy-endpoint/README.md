@@ -25,7 +25,7 @@ theorem werner3_endpoint_all_d :
     ∀ (d : ℕ) (C : Matrix (Fin 3 → Fin d) (Fin 3 → Fin d) ℂ), C.rank ≤ 2 → 0 ≤ WernerEndpoint.qfun C
 ```
 
-I prove it for every $d \in \mathbb{N}$ in Lean, including the degenerate cases; the physically substantive range is $d \ge 3$, which is the range Tomar proves by non-formalized means. Nothing in this folder should be read as claiming a new mathematical theorem about Werner states. My claim is about formalization: one proof, checked by the Lean kernel from scratch, covering every dimension at once.
+I prove it for every $d \in \mathbb{N}$ in Lean, including the degenerate cases; the physically substantive range is $d \ge 3$, which is the range Tomar proves by non-formalized means. Nothing in this folder should be read as claiming a new mathematical theorem about Werner states. My claim is about formalization: one proof, checked by the Lean kernel from scratch, covering every dimension at once, by a route that does not depend on Tomar's proof.
 
 ## Method (proof outline only)
 
@@ -47,7 +47,7 @@ I use a strengthened moment relaxation, taken to its $t = 1/d \to 0$ limit, plus
 ## Prior art
 
 - Tejasvi Singh Tomar, *Undistillability of Werner states from three, four and five copies*, Zenodo, DOI 10.5281/zenodo.23718035, v4, October 2026 (preprint, not peer reviewed), proves the three-copy endpoint for every $d \ge 3$. Its route uses a base certificate polynomial in $1/d$ for $d \ge 9$, plus exact certificates for smaller $d$. It is kernel-checked in Lean for $3 \le d \le 8$ only; the paper states that "the case $d \ge 9$ is not formalized".
-- The all-$d$ $t = 0$ certificate in this folder is therefore an independent confirmation by a different route, not a new theorem. The new contribution claimed here is the complete kernel-only Lean proof for every $d$, closing the formalization gap at $d \ge 9$.
+- The all-$d$ $t = 0$ certificate in this folder is therefore an independent confirmation by a different route, not a new theorem. This proof is self-contained: it does not use Tomar's certificate, argument, or result as a step. It proves the endpoint from the $t = 0$ certificate and lemma chain shipped in this folder, and its Lean proof does not import or formalize Tomar's proof. The new contribution claimed here is the complete kernel-only Lean proof for every $d$, closing the formalization gap at $d \ge 9$.
 - As far as I have found, no other work formalizes the all-$d$ endpoint in Lean. If you know of an earlier complete kernel-only Lean proof for every $d$, please open an issue.
 
 ## Caveats
