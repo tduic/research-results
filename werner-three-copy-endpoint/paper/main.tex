@@ -1,0 +1,240 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[expansion=false]{microtype}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\hypersetup{pdftitle={A complete kernel-only Lean proof of the three-copy Werner endpoint for every dimension},pdfauthor={Tyler Duic}}
+\input{numbers}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Tr}{\operatorname{Tr}}
+
+\title{A complete kernel-only Lean proof\\ of the three-copy Werner endpoint\\ for every dimension}
+\author{Tyler Duic\\[2pt]\small Independent researcher, New York, NY\\\small ORCID \href{https://orcid.org/0009-0005-4675-3045}{0009-0005-4675-3045}\\\small\url{https://github.com/tduic}}
+\date{November 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+For $C$ an operator on $(\C^d)^{\otimes 3}$ of rank at most $2$, let
+$q(C) = \sum_{S \subseteq \{1,2,3\}} (-1/2)^{|S|} \lVert \Tr_S C \rVert_F^2$.
+The inequality $q(C) \ge 0$ is the three-copy Werner endpoint.
+I prove nothing new about Werner states in this note: the endpoint was
+already proved for every $d \ge 3$ by Tomar~\cite{tomar2026}, whose Lean
+formalization covers $3 \le d \le 8$ only.
+What I contribute is a complete kernel-only Lean~4 proof of the endpoint
+for every $d$, by an independent route: one exact rational certificate of
+the $t = 1/d \to 0$ limit of a strengthened moment relaxation, carried to
+every dimension by a lemma chain, with the certificate's exact identity
+proved in the Lean kernel.
+The final theorem depends only on the standard axioms
+\texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound},
+with no \texttt{sorry} and no \texttt{native\_decide}, and I had its
+statement independently checked to confirm it says what I claim here.
+\end{abstract}
+
+\section{Introduction}
+
+The Werner state $\rho_\alpha \propto I - \alpha F$ on $\C^d \otimes \C^d$,
+where $F$ is the swap, is a central test case for distillability.
+For $k$ copies, undistillability reduces to a quadratic-form inequality on
+operators $C$ of rank at most $2$ on $(\C^d)^{\otimes 3}$ when $k = 3$.
+Define, for $\alpha \in \mathbb{R}$,
+\begin{equation}
+q_\alpha(C) = \sum_{S \subseteq \{1,2,3\}} (-\alpha)^{|S|} \lVert \Tr_S C \rVert_F^2,
+\qquad q = q_{1/2}.
+\end{equation}
+Then $\rho_\alpha$ is three-copy undistillable exactly when $q_\alpha \ge 0$
+on rank-$\le 2$ operators $C$, and the continuation identity used in the
+earlier work on this problem shows that
+$q_\alpha \ge (1-2\alpha)(1-\alpha)^2 \lVert C \rVert^2$ on $[0, 1/2]$
+holds in dimension $d$ exactly when the endpoint $q \ge 0$ holds there.
+The endpoint is therefore the sharp three-copy statement.
+
+Tomar~\cite{tomar2026} proves the endpoint for every $d \ge 3$,
+by a base certificate polynomial in $1/d$ for $d \ge 9$ plus exact
+certificates for smaller $d$.
+That paper is a preprint, not peer reviewed, and its Lean formalization
+covers $3 \le d \le 8$ only: the paper states that
+``the case $d \ge 9$ is not formalized''.
+I close that formalization gap, by a different certificate route, and I
+claim nothing else as new.
+
+\begin{theorem}\label{thm:main}
+For every $d$ and every operator $C$ on $(\C^d)^{\otimes 3}$ of rank at
+most $2$, $q(C) \ge 0$.
+\end{theorem}
+
+Theorem~\ref{thm:main} is Tomar's theorem, restated.
+My contribution is Theorem~\ref{thm:lean} below:
+the same statement, proved in Lean~4 by the kernel, for every $d$ at once.
+
+\section{The moment relaxation and its $t = 0$ limit}
+
+I prove Theorem~\ref{thm:main} in Lean through a strengthened moment
+relaxation.
+A rank-$\le 2$ operator $C$ lifts to moments built from its factors;
+twirling over the relevant symmetries lands in a commutative algebra
+spanned by diagram operators, and the question becomes whether a certain
+moment functional is nonnegative on the physical moment set.
+Replacing the orbit variables by trace coordinates $m$ makes
+the relaxation $d$-free except for the site modules: the objective and
+the equality rows are trace functionals, so they have $d$-free
+coefficients in $m$, while only the positive-semidefinite blocks depend
+on $d$, through site matrices $N_r(p)(t)$ with $t = 1/d$.
+
+At $t = 0$ no site module degenerates: every module's limit matrices
+span the full matrix algebra. An exact rational certificate
+$X_b \succeq 0$ and multipliers $\lambda$ for the $t = 0$ relaxation
+therefore suffices, by the lemma chain of Section~\ref{sec:chain},
+to prove $q(C) \ge 0$ in every dimension.
+The certificate I use is the compact v2 certificate shipped in this
+folder. It passes the standalone exact verifier \texttt{verify\_t0.py}:
+\nblocks{} blocks are positive definite.
+It is $\certshrunk{}\times$ smaller in bits than the earlier v1 certificate
+(\certbits{} bits versus \vonebits{} bits), and its correction
+denominator is \dendelbits{} bits (v1: \vonedendelbits{} bits).
+These are properties of the shipped certificate data, checked by exact
+rational arithmetic outside Lean; Section~\ref{sec:lean} is what moves
+the same identity into the Lean kernel.
+
+\section{The lemma chain}\label{sec:chain}
+
+The chain is an abstract theorem in Lean, \texttt{endpoint\_of\_t0\_cert}:
+given a $t = 0$ certificate, the endpoint follows in every dimension.
+Its steps are:
+
+\begin{enumerate}
+\item \emph{Embedding.} A physical point of dimension $e$ embeds into
+$d \ge \max(e, 4)$ without changing $m$ or $q$, because the permutation
+operators commute with the embedding and partial traces commute with it.
+\item \emph{Validity at dimension $d$.} The twirled coordinates
+satisfy every homogeneous row, the trace row equals $1$, the objective
+equals $q(C)$, and every word block and coupled block is positive
+semidefinite, for any real tensor-space module basis.
+\item \emph{$d$-freeness in $m$.} Every row and the objective are trace
+functionals, so their $m$-forms are exactly their $d$-pipeline forms
+composed with the Weingarten change of variables. The qubit factor
+causes no gap, since the conjugated moments lie in the range of the
+qubit Gram matrix.
+\item \emph{Blocks at $t = 1/d$.} For $d \ge 4$, the blocks built from
+$N_r(p)(1/d)$ are positive multiples of compressions of the true blocks:
+the site data are positive multiples of Gram-form matrices, the
+one-site Gram matrix at the identity is positive definite, and the
+denominator $(1-d^{-2})(1-4d^{-2})(1-9d^{-2})$ is positive.
+Hence the blocks are positive semidefinite for every physical $m$ of
+dimension $e \le d$.
+\item \emph{Continuity.} The site matrices are polynomial in $t$, so the
+blocks converge as $t = 1/d \to 0$, and the positive-semidefinite cone
+is closed. Every physical $m$, of every dimension, therefore lies in
+the $t = 0$ feasible set.
+\item \emph{Pairing.} At a physical $m$,
+$q(C) = \sum_b \langle X_b, L_b(0)(m) \rangle + \lambda_{\mathrm{trace}}$,
+a sum of nonnegative pairings plus a nonnegative trace multiplier.
+Hence $q(C) \ge 0$.
+\end{enumerate}
+
+I proved each step in Lean in the \texttt{AllD} layers, with no
+\texttt{sorry} and only the standard axioms.
+The chain is generic: it does not depend on the particular certificate,
+only on the existence of one satisfying the $t = 0$ certificate
+conditions. The remaining work is therefore exactly one thing:
+proving the certificate identity for the explicit v2 data, in the kernel.
+
+\section{Layer D: the certificate identity in the kernel}\label{sec:lean}
+
+The one hypothesis of \texttt{endpoint\_of\_t0\_cert} that is not generic
+is the exact identity for the explicit certificate data, \texttt{IdentityT0}:
+for every orbit-invariant $\mu$, the objective equals the sum over blocks
+of $\langle X_b, L_b(\mu) \rangle$ plus the row terms.
+I prove this identity in the Lean kernel, in three parts.
+
+First, the \emph{bridge} rewrites each block pairing as a sum over family
+parts, with a common integer scale, so that the identity becomes a
+vanishing statement for family totals.
+Second, the \emph{glue} reduces that statement to \texttt{FamZero} for
+the three families, i.e.\ to literal-free family totals, using only the
+orbit invariances of $\mu$; coupled block parts fold through a
+kernel-checked full-rank re-presentation.
+Third, the \emph{compute} checks the family totals in the kernel, in
+\nmodules{} generated identity modules pinned by SHA-256 in
+\texttt{identity\_manifest.json}, together with the hashes of the four
+certificate files (\texttt{blocks.jsonl}, \texttt{multipliers.json},
+\texttt{qubit.json}, \texttt{sites.json}).
+A rep-budget split was needed to fit the largest claim modules under
+the process memory limit; it raised the module count from \nmodulesbefore{} to
+\nmodules{} without changing any family total.
+
+The complete build ran as run \runid{}, in one
+\ncpu{}-CPU, \containergb{}~GB container, from a clean checkout, starting
+\runstart{} and finishing \runend{}
+(\walltime{} wall time, \cpuhours{} CPU-hours summed over the modules).
+All \nmodules{} modules kernel-checked with return code $0$
+(prep \nprep{}, light \nlight{}, heavy \nheavy{}, final \nfinal{});
+\nretries{} attempts of the parallel light pass were killed for memory and passed
+in the serial retry; the run summary records no Lean error anywhere.
+Peak memory was \peakmem{}~GB for one module.
+
+\begin{theorem}\label{thm:lean}
+In Lean~4, with Mathlib, the theorem
+\texttt{LayerDT0.werner3\_endpoint\_all\_d} states that for every
+$d : \mathbb{N}$ and every
+$C : \mathrm{Matrix}\,(\mathrm{Fin}\,3 \to \mathrm{Fin}\,d)\,
+(\mathrm{Fin}\,3 \to \mathrm{Fin}\,d)\,\C$ with $C.\mathrm{rank} \le 2$,
+$0 \le \mathrm{qfun}\,C$, where \texttt{qfun} is the Lean definition of $q$.
+It depends only on the axioms \texttt{propext},
+\texttt{Classical.choice}, and \texttt{Quot.sound}.
+\end{theorem}
+
+The same axiom list holds for \texttt{LayerDT0.identityT0}.
+I scanned every shipped Lean file for \texttt{sorry}, \texttt{admit},
+\texttt{axiom}, \texttt{native\_decide}, \texttt{implemented\_by},
+\texttt{extern}, \texttt{unsafe}, and \texttt{opaque} outside comments;
+the scan found none (see \texttt{tests/test\_lean\_scan.py} in this folder).
+An independent agent that had not seen the work producing the proof
+checked the final theorem's statement and rated it faithful:
+\texttt{qfun} is proved equal in Lean to an independently written $q$
+(the six proper partial traces written out on index triples, Mathlib's
+\texttt{Matrix.trace} for the full trace, \texttt{Complex.normSq} for
+squared entries), rank is Mathlib's \texttt{Matrix.rank} with no
+coercions, no shadowing declarations or extra axioms were found in the
+import chain, $d = 1$ gives $q = \lVert c \rVert^2/8$ in Lean as expected,
+and an independent NumPy comparison on random complex $C$ gave maximum
+relative difference approximately $\maxreldiff{}$.
+The proof term itself was out of scope for that check; the kernel build
+above is what checks it.
+
+\section{Prior art, and what I do not claim}
+
+Tomar~\cite{tomar2026} proves Theorem~\ref{thm:main} for every $d \ge 3$.
+What is new here is Theorem~\ref{thm:lean}: as far as I have found, the
+first complete kernel-only Lean proof of the endpoint for every $d$,
+closing the formalization gap at $d \ge 9$ left by Tomar~\cite{tomar2026}.
+If an earlier complete kernel-only Lean proof for every $d$ exists,
+I ask to be told, and I will correct this claim.
+Nothing here concerns any other number of copies, and my claim is the
+all-$d$ proof only.
+
+\section*{Acknowledgements}
+
+I did this work with substantial help from AI models
+(Anthropic's Claude): searching, writing code and Lean proofs, and
+running the independent reviews described above.
+I directed the work and I am responsible for every claim;
+that is why everything here is backed by code, data, tests, and
+machine-checked proofs that anyone can rerun from this folder alone.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
