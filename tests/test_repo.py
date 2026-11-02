@@ -75,3 +75,19 @@ def test_arxiv_meta_lists_every_paper():
             assert keys == FOLDERS, (keys, FOLDERS)
             return
     raise AssertionError("no META dict found in tools/make_arxiv.py")
+
+
+@pytest.mark.parametrize("name", RESULTS)
+def test_result_paper_workflow_is_split(name):
+    """The paper job lives in its own workflow, and the code workflow
+    excludes paper files and docs, so a paper-only or docs-only change
+    does not run code jobs (or, for docs, any per-result job)."""
+    paper_wf = ROOT / ".github" / "workflows" / f"{name}-paper.yml"
+    assert paper_wf.is_file(), f"no paper workflow for {name}"
+    paper_text = paper_wf.read_text()
+    assert f"{name}/paper/**" in paper_text and f"sparse-checkout: {name}" in paper_text
+    assert "\n  paper:\n" in paper_text
+    code_text = (ROOT / ".github" / "workflows" / f"{name}.yml").read_text()
+    assert f"!{name}/paper/**" in code_text, f"{name} code workflow does not exclude paper files"
+    assert f"!{name}/**.md" in code_text, f"{name} code workflow does not exclude docs"
+    assert "\n  paper:\n" not in code_text, f"{name} code workflow still contains a paper job"
