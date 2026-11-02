@@ -1,0 +1,39 @@
+# Rebuilds the dqi-finite-size paper on its own: checks out only that folder, so it cannot depend on anything else.
+# Split from dqi-finite-size.yml so a paper-only change does not run quick or reproduce.
+name: dqi-finite-size (paper)
+
+on:
+  push:
+    branches: [main]
+    paths: ["dqi-finite-size/paper/**", ".github/workflows/dqi-finite-size-paper.yml"]
+  pull_request:
+    paths: ["dqi-finite-size/paper/**", ".github/workflows/dqi-finite-size-paper.yml"]
+  schedule:
+    - cron: "17 6 * * 1"   # weekly re-verification
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+defaults:
+  run:
+    working-directory: dqi-finite-size
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: dqi-finite-size
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install LaTeX
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-science latexmk poppler-utils
+      - run: ./verify.sh paper
